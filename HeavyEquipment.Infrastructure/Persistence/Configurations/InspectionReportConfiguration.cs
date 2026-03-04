@@ -1,7 +1,6 @@
 ﻿using HeavyEquipment.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Text.Json;
 
 namespace HeavyEquipment.Infrastructure.Persistence.Configurations
 {
@@ -9,19 +8,39 @@ namespace HeavyEquipment.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<InspectionReport> builder)
         {
-            builder.HasKey(ir => ir.Id);
+            builder.ToTable("InspectionReports");
+            builder.HasKey(i => i.Id);
 
-            builder.Property(ir => ir.PhotoUrls)
-            .HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                v => JsonSerializer.Deserialize<List<string>>(v, (JsonSerializerOptions)null)
-            ).HasColumnType("nvarchar(max)"); ;
+            builder.Property(i => i.Notes)
+                .HasMaxLength(1000);
 
-            builder.Property(ir => ir.Result).HasConversion<string>();
+            builder.Property(i => i.HoursReading)
+                .IsRequired();
 
-            builder.HasOne(ir => ir.RentalOrder)
-                   .WithMany(ro => ro.Inspections)
-                   .HasForeignKey(ir => ir.RentalOrderId);
+            builder.Property(i => i.Result)
+                .IsRequired()
+                .HasConversion<string>()
+                .HasMaxLength(30);
+
+            builder.Property(i => i.Type)
+                .IsRequired()
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            builder.Property(i => i.InspectionDate)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
+
+            builder.Property(i => i.PhotoUrls)
+                .HasConversion(
+                    v => string.Join(',', v),
+                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                )
+                .HasColumnName("PhotoUrls")
+                .HasMaxLength(4000);
+
+            builder.HasIndex(i => i.RentalOrderId)
+                .HasDatabaseName("IX_InspectionReports_RentalOrderId");
         }
     }
 }

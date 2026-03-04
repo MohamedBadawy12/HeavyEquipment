@@ -8,16 +8,27 @@ namespace HeavyEquipment.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<LogisticsProvider> builder)
         {
-            builder.HasKey(lp => lp.Id);
+            builder.ToTable("LogisticsProviders");
+            builder.HasKey(l => l.Id);
 
-            builder.Property(lp => lp.CompanyName).IsRequired().HasMaxLength(200);
-            builder.Property(lp => lp.RatePerKilometer).HasColumnType("decimal(18,2)");
+            builder.Property(l => l.CompanyName)
+                .IsRequired()
+                .HasMaxLength(200);
 
+            builder.Property(l => l.ContactNumber)
+                .IsRequired()
+                .HasMaxLength(20);
 
-            builder.HasMany<RentalOrder>()
-                   .WithOne(ro => ro.LogisticsProvider)
-                   .HasForeignKey(ro => ro.LogisticsProviderId)
-                   .OnDelete(DeleteBehavior.SetNull);
+            builder.Property(l => l.RatePerKilometer)
+                .IsRequired()
+                .HasColumnType("decimal(8,2)");
+
+            builder.Property(l => l.IsActive)
+                .HasDefaultValue(true);
+
+            builder.Property(l => l.CreatedAt)
+                .IsRequired()
+                .HasDefaultValueSql("GETUTCDATE()");
         }
     }
 }
