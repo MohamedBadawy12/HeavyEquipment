@@ -1,13 +1,19 @@
-﻿using HeavyEquipment.Domain.Entities;
-
-namespace HeavyEquipment.Domain.Interfaces
+﻿namespace HeavyEquipment.Domain.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {
-        IGenericRepository<Equipment> Equipments { get; }
-        IGenericRepository<RentalOrder> RentalOrders { get; }
-        IGenericRepository<AppUser> Users { get; }
+        IEquipmentRepository Equipments { get; }
+        IRentalOrderRepository RentalOrders { get; }
+        IInspectionReportRepository InspectionReports { get; }
+        IInsurancePolicyRepository InsurancePolicies { get; }
+        IReviewRepository Reviews { get; }
+        INotificationRepository Notifications { get; }
+        ILogisticsProviderRepository LogisticsProviders { get; }
 
-        Task<int> CompleteAsync();
+        Task<int> SaveChangesAsync(CancellationToken ct = default);
+
+        Task BeginTransactionAsync(CancellationToken ct = default);
+        Task CommitTransactionAsync(CancellationToken ct = default);
+        Task RollbackTransactionAsync(CancellationToken ct = default);
     }
 }

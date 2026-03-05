@@ -1,3 +1,5 @@
+using HeavyEquipment.Infrastructure;
+
 namespace HeavyEquipment.WebMVC
 {
     public class Program
@@ -8,6 +10,8 @@ namespace HeavyEquipment.WebMVC
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             builder.Services.AddMediatR(cfg =>
                  cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
