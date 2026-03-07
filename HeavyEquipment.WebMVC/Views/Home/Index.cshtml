@@ -1,8 +1,236 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "الرئيسية";
+    Layout = "_Layout";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@* CSS خاص بالـ Home Page بس *@
+@section Styles {
+    <link rel="stylesheet" href="~/css/Home.css" />
+}
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">🏗 منصة المعدات الثقيلة الأولى في المنطقة</div>
+
+        <h1 class="hero-title">
+            <span class="line-gold">HEAVY</span>
+            <span>EQUIPMENT</span>
+            <span class="line-outline">PLATFORM</span>
+        </h1>
+
+        <p class="hero-subtitle">
+            استأجر أو أجّر معداتك الثقيلة بكل سهولة وأمان.
+            أوناش، جرافات، مولدات، وأكثر — بضغطة زر واحدة.
+        </p>
+
+        <div class="hero-actions">
+            <a asp-controller="Equipment" asp-action="Index" class="btn-primary">تصفح المعدات</a>
+            <a asp-controller="Home" asp-action="HowItWorks" class="btn-outline">كيف يعمل؟</a>
+        </div>
+
+        <div class="hero-stats">
+            <div class="stat-item">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">معدة متاحة</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">120+</div>
+                <div class="stat-label">مالك موثوق</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">1.2K</div>
+                <div class="stat-label">صفقة ناجحة</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">رضا العملاء</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+        <div class="equipment-showcase">
+            <div class="float-card float-card-1">
+                <div class="float-label">إجمالي الصفقات اليوم</div>
+                <div class="float-value">+24 صفقة</div>
+            </div>
+            <div class="float-card float-card-2">
+                <div class="float-label">توفير متوسط</div>
+                <div class="float-value" style="color:#4CAF50">40% توفير</div>
+            </div>
+            <div class="showcase-card">
+                <div class="showcase-card-header">
+                    <div class="equipment-tag">أوناش</div>
+                    <div class="equipment-status">
+                        <div class="status-dot"></div>
+                        متاح الآن
+                    </div>
+                </div>
+                <div class="equipment-icon-wrapper">🏗</div>
+                <div class="equipment-name">رافعة برجية — LIEBHERR 380</div>
+                <div class="equipment-meta">القاهرة، مصر الجديدة • سنة 2021</div>
+                <div class="equipment-price-row">
+                    <div>
+                        <div class="price-label">السعر / ساعة</div>
+                        <div>
+                            <span class="price-value">850</span>
+                            <span class="price-unit"> ج.م</span>
+                        </div>
+                    </div>
+                    <button class="rent-btn">احجز الآن</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section reveal">
+    <div class="section-header">
+        <div>
+            <div class="section-label">CATEGORIES</div>
+            <div class="gold-divider"></div>
+            <h2 class="section-title">تصفح حسب النوع</h2>
+        </div>
+        <a asp-controller="Equipment" asp-action="Index" class="view-all">عرض الكل ←</a>
+    </div>
+
+    <div class="categories-grid">
+        <a asp-controller="Equipment" asp-action="Index" asp-route-category="Crane" class="category-card">
+            <span class="category-icon">🏗</span>
+            <div class="category-name">أوناش ورافعات</div>
+            <div class="category-count"><span>47</span> معدة متاحة</div>
+        </a>
+        <a asp-controller="Equipment" asp-action="Index" asp-route-category="Excavator" class="category-card">
+            <span class="category-icon">🚜</span>
+            <div class="category-name">جرافات وحفارات</div>
+            <div class="category-count"><span>63</span> معدة متاحة</div>
+        </a>
+        <a asp-controller="Equipment" asp-action="Index" asp-route-category="Generator" class="category-card">
+            <span class="category-icon">⚡</span>
+            <div class="category-name">مولدات كهربائية</div>
+            <div class="category-count"><span>38</span> معدة متاحة</div>
+        </a>
+        <a asp-controller="Equipment" asp-action="Index" asp-route-category="Bulldozer" class="category-card">
+            <span class="category-icon">🚧</span>
+            <div class="category-name">بلدوزر وروافع</div>
+            <div class="category-count"><span>29</span> معدة متاحة</div>
+        </a>
+    </div>
+</section>
+
+<!-- FEATURED EQUIPMENT -->
+<section class="section reveal">
+    <div class="section-header">
+        <div>
+            <div class="section-label">FEATURED</div>
+            <div class="gold-divider"></div>
+            <h2 class="section-title">معدات مميزة</h2>
+        </div>
+        <a asp-controller="Equipment" asp-action="Index" class="view-all">عرض الكل ←</a>
+    </div>
+
+    <div class="equipment-grid">
+        <a asp-controller="Equipment" asp-action="Details" asp-route-id="1" class="eq-card">
+            <div class="eq-card-image">
+                🏗
+                <div class="eq-card-badge">أوناش</div>
+            </div>
+            <div class="eq-card-body">
+                <div class="eq-card-name">رافعة برجية LIEBHERR 380</div>
+                <div class="eq-card-location">📍 القاهرة، مصر الجديدة</div>
+                <div class="eq-card-footer">
+                    <div class="eq-price">850 <span class="eq-price-unit">ج.م/ساعة</span></div>
+                    <div class="eq-rating">⭐ 4.9 (32)</div>
+                </div>
+            </div>
+        </a>
+
+        <a asp-controller="Equipment" asp-action="Details" asp-route-id="2" class="eq-card">
+            <div class="eq-card-image">
+                🚜
+                <div class="eq-card-badge">جرافات</div>
+            </div>
+            <div class="eq-card-body">
+                <div class="eq-card-name">حفارة كاتربيلر CAT 320</div>
+                <div class="eq-card-location">📍 الإسكندرية، سيدي بشر</div>
+                <div class="eq-card-footer">
+                    <div class="eq-price">620 <span class="eq-price-unit">ج.م/ساعة</span></div>
+                    <div class="eq-rating">⭐ 4.7 (18)</div>
+                </div>
+            </div>
+        </a>
+
+        <a asp-controller="Equipment" asp-action="Details" asp-route-id="3" class="eq-card">
+            <div class="eq-card-image">
+                ⚡
+                <div class="eq-card-badge">مولدات</div>
+            </div>
+            <div class="eq-card-body">
+                <div class="eq-card-name">مولد كهربائي Perkins 500KVA</div>
+                <div class="eq-card-location">📍 الجيزة، 6 أكتوبر</div>
+                <div class="eq-card-footer">
+                    <div class="eq-price">450 <span class="eq-price-unit">ج.م/ساعة</span></div>
+                    <div class="eq-rating">⭐ 4.8 (41)</div>
+                </div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-section reveal">
+    <div style="padding:0 0 3rem; text-align:center">
+        <div class="section-label">HOW IT WORKS</div>
+        <div class="gold-divider" style="margin: 0.5rem auto 0;"></div>
+        <h2 class="section-title" style="margin-top:0.5rem">كيف تعمل المنصة؟</h2>
+    </div>
+
+    <div class="steps-grid">
+        <div class="step-item">
+            <div class="step-number">01</div>
+            <div class="step-icon">🔍</div>
+            <div class="step-title">ابحث عن معدتك</div>
+            <div class="step-desc">تصفح مئات المعدات المتاحة وفلتر حسب النوع والموقع والسعر</div>
+        </div>
+        <div class="step-item">
+            <div class="step-number">02</div>
+            <div class="step-icon">📋</div>
+            <div class="step-title">قدّم طلب الإيجار</div>
+            <div class="step-desc">اختر الفترة المناسبة وقدّم طلبك مع تفاصيل المشروع</div>
+        </div>
+        <div class="step-item">
+            <div class="step-number">03</div>
+            <div class="step-icon">✅</div>
+            <div class="step-title">تأكيد وفحص المعدة</div>
+            <div class="step-desc">المالك يؤكد الطلب ويتم فحص المعدة قبل التسليم</div>
+        </div>
+        <div class="step-item">
+            <div class="step-number">04</div>
+            <div class="step-icon">🚀</div>
+            <div class="step-title">ابدأ مشروعك</div>
+            <div class="step-desc">استلم المعدة وابدأ العمل بضمان كامل وتأمين شامل</div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section reveal">
+    <div class="section-label">GET STARTED</div>
+    <h2 class="cta-title">هل لديك معدات ثقيلة؟</h2>
+    <p class="cta-subtitle">
+        حوّل معداتك إلى مصدر دخل ثابت. سجّل الآن وابدأ في تأجير معداتك لآلاف المقاولين.
+    </p>
+    <div class="cta-actions">
+        <a asp-controller="Account" asp-action="Register" asp-route-role="Owner" class="btn-primary">
+            سجّل كمالك معدات
+        </a>
+        <a asp-controller="Equipment" asp-action="Index" class="btn-outline">تصفح المعدات</a>
+    </div>
+</section>
+
+@* JS خاص بالـ Home Page بس *@
+@section Scripts {
+    <script src="~/js/site.js"></script>
+}

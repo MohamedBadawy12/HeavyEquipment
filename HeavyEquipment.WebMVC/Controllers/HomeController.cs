@@ -13,15 +13,16 @@ namespace HeavyEquipment.WebMVC.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        public IActionResult Index() => View();
+        public IActionResult HowItWorks() => View();
+        public IActionResult About() => View();
+        public IActionResult Contact() => View();
+        public IActionResult FAQ() => View();
+        public IActionResult Insurance() => View();
+        public IActionResult Safety() => View();
+        public IActionResult Terms() => View();
+        public IActionResult Privacy() => View();
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

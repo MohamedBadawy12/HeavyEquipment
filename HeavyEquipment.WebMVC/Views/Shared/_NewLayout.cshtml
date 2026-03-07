@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — HeavyHub</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
+
+    <!-- Site-wide CSS -->
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <!-- Page-specific CSS (اختياري — كل صفحة تضيف CSS خاص بيها) -->
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="navbar">
+
+        <!-- Logo -->
+        <a href="/" class="nav-logo">
+            <div class="logo-icon">⚙</div>
+            <span class="logo-text">HEAVY<span>HUB</span></span>
+        </a>
+
+        <!-- Links -->
+        <ul class="nav-links">
+            <li><a asp-controller="Home" asp-action="Index">الرئيسية</a></li>
+            <li><a asp-controller="Equipment" asp-action="Index">تصفح المعدات</a></li>
+            <li><a asp-controller="Home" asp-action="HowItWorks">كيف يعمل</a></li>
+            <li><a asp-controller="Home" asp-action="About">عن المنصة</a></li>
+
+            @if (User.Identity!.IsAuthenticated)
+            {
+                <!-- User Dropdown -->
+                <li class="nav-user">
+                    <button class="nav-user-btn">
+                        <div class="nav-avatar">
+                            @User.Identity.Name?[0].ToString().ToUpper()
+                        </div>
+                        @User.Identity.Name
+                        ▾
+                    </button>
+                    <div class="nav-dropdown">
+                        @if (User.IsInRole("Owner"))
+                        {
+                            <a asp-controller="Dashboard" asp-action="Index">📊 لوحة التحكم</a>
+                            <a asp-controller="Equipment" asp-action="MyEquipments">🏗 معداتي</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="RentalOrder" asp-action="MyOrders">📋 طلباتي</a>
+                        }
+                        <a asp-controller="Account" asp-action="Profile">👤 الملف الشخصي</a>
+                        <a asp-controller="Notification" asp-action="Index">🔔 الإشعارات</a>
+                        <a asp-controller="Account" asp-action="Logout" class="danger">🚪 تسجيل الخروج</a>
+                    </div>
+                </li>
+            }
+            else
+            {
+                <li><a asp-controller="Account" asp-action="Login">تسجيل الدخول</a></li>
+                <li><a asp-controller="Account" asp-action="Register" class="nav-cta">ابدأ الآن</a></li>
+            }
+        </ul>
+
+        <!-- Mobile Menu Button -->
+        <button class="nav-mobile-btn" onclick="toggleMobileMenu()">☰</button>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="page-wrapper">
+
+        <!-- TempData Alerts -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success" style="margin: 1rem 4rem 0;">
+                ✅ @TempData["Success"]
+            </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error" style="margin: 1rem 4rem 0;">
+                ❌ @TempData["Error"]
+            </div>
+        }
+
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning" style="margin: 1rem 4rem 0;">
+                ⚠️ @TempData["Warning"]
+            </div>
+        }
+
+        <!-- Page Content -->
+        @RenderBody()
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="/" class="nav-logo">
+                    <div class="logo-icon">⚙</div>
+                    <span class="logo-text" style="font-size:1.4rem">HEAVY<span>HUB</span></span>
+                </a>
+                <p>منصة التداول التشاركي للمعدات الثقيلة في مصر والشرق الأوسط. نربط أصحاب المعدات بالمقاولين بأمان وسهولة.</p>
+            </div>
+
+            <div>
+                <div class="footer-heading">المنصة</div>
+                <ul class="footer-links">
+                    <li><a asp-controller="Equipment" asp-action="Index">تصفح المعدات</a></li>
+                    <li><a asp-controller="Home" asp-action="HowItWorks">كيف يعمل</a></li>
+                    <li><a asp-controller="Home" asp-action="About">عن المنصة</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact">تواصل معنا</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-heading">الدعم</div>
+                <ul class="footer-links">
+                    <li><a asp-controller="Home" asp-action="FAQ">الأسئلة الشائعة</a></li>
+                    <li><a asp-controller="Home" asp-action="Insurance">التأمين</a></li>
+                    <li><a asp-controller="Home" asp-action="Safety">السلامة</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="footer-heading">قانوني</div>
+                <ul class="footer-links">
+                    <li><a asp-controller="Home" asp-action="Terms">الشروط والأحكام</a></li>
+                    <li><a asp-controller="Home" asp-action="Privacy">سياسة الخصوصية</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div>© @DateTime.Now.Year HeavyHub. جميع الحقوق محفوظة.</div>
+            <div class="footer-social">
+                <a href="#">LinkedIn</a>
+                <a href="#">Twitter</a>
+                <a href="#">Facebook</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="~/js/site.js"></script>
+
+    <!-- Page-specific JS (اختياري — كل صفحة تضيف JS خاص بيها) -->
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

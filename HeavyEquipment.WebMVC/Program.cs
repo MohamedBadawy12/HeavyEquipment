@@ -1,5 +1,8 @@
 using HeavyEquipment.Application;
+using HeavyEquipment.Domain.Entities;
 using HeavyEquipment.Infrastructure;
+using HeavyEquipment.Infrastructure.Persistence.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace HeavyEquipment.WebMVC
 {
@@ -13,6 +16,23 @@ namespace HeavyEquipment.WebMVC
             builder.Services.AddApplication();
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddControllersWithViews();
+
+
+            builder.Services.AddIdentity<AppUser, AppRole>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Lockout.MaxFailedAccessAttempts = 5;
+            })
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
+
+            // Cookie Auth
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/Login";
+            });
 
             var app = builder.Build();
 
