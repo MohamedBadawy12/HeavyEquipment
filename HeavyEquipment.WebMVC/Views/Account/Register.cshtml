@@ -1,0 +1,143 @@
+﻿@model HeavyEquipment.WebMVC.ViewModels.Account.RegisterViewModel
+@{
+    ViewData["Title"] = "إنشاء حساب";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "auth";
+}
+
+<div class="auth-wrapper">
+
+    <div class="auth-side">
+        <div class="auth-side-content">
+            <div class="auth-logo">
+                <div class="logo-icon">⚙</div>
+                <span class="logo-text">HEAVY<span>HUB</span></span>
+            </div>
+            <h2 class="auth-side-title">انضم لمنصة المعدات الثقيلة الأولى</h2>
+            <p class="auth-side-desc">سواء كنت صاحب معدات أو مقاول، HeavyHub هو وجهتك المثالية.</p>
+
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">🏗</div>
+                    <div>
+                        <div class="auth-feature-title">مالك معدات؟</div>
+                        <div class="auth-feature-desc">حوّل معداتك لمصدر دخل ثابت</div>
+                    </div>
+                </div>
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">🚜</div>
+                    <div>
+                        <div class="auth-feature-title">مقاول؟</div>
+                        <div class="auth-feature-desc">استأجر ما تحتاجه بأسعار تنافسية</div>
+                    </div>
+                </div>
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">✅</div>
+                    <div>
+                        <div class="auth-feature-title">مجاناً للتسجيل</div>
+                        <div class="auth-feature-desc">ابدأ دلوقتي بدون رسوم</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-main">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h1 class="auth-title">إنشاء حساب جديد</h1>
+                <p class="auth-subtitle">أنت على بعد خطوة واحدة</p>
+            </div>
+
+            @* Role Selector *@
+            <div class="role-selector">
+                <div class="role-option @(ViewBag.Role == "Customer" ? "active" : "")"
+                     onclick="selectRole('Customer')">
+                    <div class="role-icon">🚜</div>
+                    <div class="role-name">مستأجر معدات</div>
+                    <div class="role-desc">أبحث عن معدات للإيجار</div>
+                </div>
+                <div class="role-option @(ViewBag.Role == "Owner" ? "active" : "")"
+                     onclick="selectRole('Owner')">
+                    <div class="role-icon">🏗</div>
+                    <div class="role-name">مالك معدات</div>
+                    <div class="role-desc">أريد تأجير معداتي</div>
+                </div>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-error">
+                    ❌
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        @error.ErrorMessage
+                    }
+                </div>
+            }
+
+            <form asp-action="Register" asp-controller="Account" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Role" id="roleInput" value="@(ViewBag.Role ?? "Customer")" />
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">الاسم الكامل</label>
+                        <input asp-for="FullName" class="form-control" placeholder="محمد أحمد" />
+                        <span asp-validation-for="FullName" class="form-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">رقم الهوية</label>
+                        <input asp-for="NationalId" class="form-control" placeholder="30012345678901" />
+                        <span asp-validation-for="NationalId" class="form-error"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input asp-for="Email" class="form-control" placeholder="example@email.com" type="email" />
+                    <span asp-validation-for="Email" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف</label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="01012345678" type="tel" />
+                    <span asp-validation-for="PhoneNumber" class="form-error"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">كلمة المرور</label>
+                        <input asp-for="Password" class="form-control" placeholder="••••••••" type="password" />
+                        <span asp-validation-for="Password" class="form-error"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">تأكيد كلمة المرور</label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••••" type="password" />
+                        <span asp-validation-for="ConfirmPassword" class="form-error"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">
+                    إنشاء الحساب
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                لديك حساب بالفعل؟
+                <a asp-controller="Account" asp-action="Login">تسجيل الدخول</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        function selectRole(role) {
+            document.getElementById('roleInput').value = role;
+            document.querySelectorAll('.role-option').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+}

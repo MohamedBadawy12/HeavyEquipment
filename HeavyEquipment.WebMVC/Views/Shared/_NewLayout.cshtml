@@ -7,12 +7,16 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
-
-    <!-- Site-wide CSS -->
     <link rel="stylesheet" href="~/css/site.css" />
 
-    <!-- Page-specific CSS (اختياري — كل صفحة تضيف CSS خاص بيها) -->
-    @await RenderSectionAsync("Styles", required: false)
+    @if (IsSectionDefined("Styles"))
+    {
+        @await RenderSectionAsync("Styles", required: false)
+    }
+    @if (ViewData["PageCss"] != null)
+    {
+        <link rel="stylesheet" href="~/css/@(ViewData["PageCss"]).css" />
+    }
 </head>
 <body>
 
@@ -152,8 +156,9 @@
     <!-- ===== SCRIPTS ===== -->
     <script src="~/js/site.js"></script>
 
-    <!-- Page-specific JS (اختياري — كل صفحة تضيف JS خاص بيها) -->
-    @await RenderSectionAsync("Scripts", required: false)
-
+    @if (IsSectionDefined("Scripts"))
+    {
+         @await RenderSectionAsync("Scripts", required: false)
+    }
 </body>
 </html>

@@ -1,0 +1,122 @@
+﻿@model HeavyEquipment.WebMVC.ViewModels.Account.LoginViewModel
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "auth";
+}
+
+<div class="auth-wrapper">
+
+    <div class="auth-side">
+        <div class="auth-side-content">
+            <div class="auth-logo">
+                <div class="logo-icon">⚙</div>
+                <span class="logo-text">HEAVY<span>HUB</span></span>
+            </div>
+            <h2 class="auth-side-title">منصة المعدات الثقيلة الأولى في المنطقة</h2>
+            <p class="auth-side-desc">استأجر أو أجّر معداتك بكل سهولة وأمان مع ضمان كامل وتأمين شامل.</p>
+
+            <div class="auth-features">
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">🏗</div>
+                    <div>
+                        <div class="auth-feature-title">500+ معدة متاحة</div>
+                        <div class="auth-feature-desc">أوناش، جرافات، مولدات وأكثر</div>
+                    </div>
+                </div>
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">🔒</div>
+                    <div>
+                        <div class="auth-feature-title">تأمين شامل</div>
+                        <div class="auth-feature-desc">كل المعدات مؤمنة بالكامل</div>
+                    </div>
+                </div>
+                <div class="auth-feature">
+                    <div class="auth-feature-icon">⭐</div>
+                    <div>
+                        <div class="auth-feature-title">98% رضا العملاء</div>
+                        <div class="auth-feature-desc">آلاف الصفقات الناجحة</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-main">
+        <div class="auth-card">
+            <div class="auth-card-header">
+                <h1 class="auth-title">مرحباً بعودتك</h1>
+                <p class="auth-subtitle">سجّل دخولك للمتابعة</p>
+            </div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-error">
+                    ❌
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        @error.ErrorMessage
+                    }
+                </div>
+            }
+
+            <form asp-action="Login" asp-controller="Account" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input asp-for="Email"
+                           class="form-control"
+                           placeholder="example@email.com"
+                           type="email" />
+                    <span asp-validation-for="Email" class="form-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label class="form-label">كلمة المرور</label>
+                        <a href="#" class="auth-forgot">نسيت كلمة المرور؟</a>
+                    </div>
+                    <div class="input-password-wrapper">
+                        <input asp-for="Password"
+                               class="form-control"
+                               placeholder="••••••••"
+                               type="password"
+                               id="passwordInput" />
+                        <button type="button" class="toggle-password" onclick="togglePassword()">👁</button>
+                    </div>
+                    <span asp-validation-for="Password" class="form-error"></span>
+                </div>
+
+                <div class="form-check">
+                    <input asp-for="RememberMe" type="checkbox" id="rememberMe" />
+                    <label for="rememberMe">تذكرني</label>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full">
+                    تسجيل الدخول
+                </button>
+            </form>
+
+            <div class="auth-divider">
+                <span>أو</span>
+            </div>
+
+            <div class="auth-footer">
+                ليس لديك حساب؟
+                <a asp-controller="Account" asp-action="Register">إنشاء حساب جديد</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('passwordInput');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+}
