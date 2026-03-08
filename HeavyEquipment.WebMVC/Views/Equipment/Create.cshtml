@@ -1,5 +1,251 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HeavyEquipment.Application.Features.Equipments.Commands.Create.CreateEquipmentCommand
 @{
+    ViewData["Title"] = "إضافة معدة جديدة";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "equipment";
 }
+
+<div class="create-page">
+
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">NEW EQUIPMENT</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">إضافة معدة جديدة</h1>
+            <p class="page-header-desc">أضف معدتك وابدأ في تحقيق الدخل فوراً</p>
+        </div>
+    </div>
+
+    <div class="create-layout">
+
+        <div class="create-form-wrapper">
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-error">
+                    ❌
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
+                </div>
+            }
+
+            <form asp-action="Create" asp-controller="Equipment" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Section 1: Basic Info -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="form-section-num">01</span>
+                        المعلومات الأساسية
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">اسم المعدة *</label>
+                            <input asp-for="Name" class="form-control" placeholder="مثال: رافعة برجية LIEBHERR 380" />
+                            <span asp-validation-for="Name" class="form-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الموديل *</label>
+                            <input asp-for="Model" class="form-control" placeholder="مثال: LIEBHERR 380 EC-H" />
+                            <span asp-validation-for="Model" class="form-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">نوع المعدة *</label>
+                            <select asp-for="Category" class="form-control">
+                                <option value="">-- اختر النوع --</option>
+                                <option value="Crane">🏗 أوناش ورافعات</option>
+                                <option value="Excavator">🚜 جرافات وحفارات</option>
+                                <option value="Generator">⚡ مولدات كهربائية</option>
+                                <option value="Bulldozer">🚧 بلدوزر</option>
+                                <option value="Forklift">🔧 رافعة شوكية</option>
+                                <option value="Loader">🚛 لودر</option>
+                                <option value="Compressor">💨 ضاغط هواء</option>
+                                <option value="Mixer">🔄 خلاطة خرسانة</option>
+                            </select>
+                            <span asp-validation-for="Category" class="form-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">سنة الصنع *</label>
+                            <input asp-for="ManufactureYear" class="form-control"
+                                   type="number" min="1990" max="@DateTime.Now.Year"
+                                   placeholder="@DateTime.Now.Year" />
+                            <span asp-validation-for="ManufactureYear" class="form-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">وصف المعدة</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"
+                                  placeholder="اكتب وصفاً تفصيلياً للمعدة — الحالة، المميزات، الاستخدامات..."></textarea>
+                        <span asp-validation-for="Description" class="form-error"></span>
+                    </div>
+                </div>
+
+                <!-- Section 2: Pricing & Maintenance -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="form-section-num">02</span>
+                        التسعير والصيانة
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">سعر الإيجار / ساعة (ج.م) *</label>
+                            <div class="input-with-suffix">
+                                <input asp-for="HourlyRate" class="form-control"
+                                       type="number" min="1" step="0.5" placeholder="500" />
+                                <span class="input-suffix">ج.م</span>
+                            </div>
+                            <span asp-validation-for="HourlyRate" class="form-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">مبلغ التأمين (ج.م) *</label>
+                            <div class="input-with-suffix">
+                                <input asp-for="DepositAmount" class="form-control"
+                                       type="number" min="0" step="100" placeholder="5000" />
+                                <span class="input-suffix">ج.م</span>
+                            </div>
+                            <span asp-validation-for="DepositAmount" class="form-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">حد ساعات الصيانة *</label>
+                        <div class="input-with-suffix">
+                            <input asp-for="MaintenanceThreshold" class="form-control"
+                                   type="number" min="0" placeholder="500" />
+                            <span class="input-suffix">ساعة</span>
+                        </div>
+                        <small style="color:var(--muted); font-size:0.78rem; margin-top:0.3rem; display:block">
+                            عدد ساعات التشغيل قبل موعد الصيانة القادمة
+                        </small>
+                        <span asp-validation-for="MaintenanceThreshold" class="form-error"></span>
+                    </div>
+                </div>
+
+                <!-- Section 3: Location -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="form-section-num">03</span>
+                        موقع المعدة
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">المدينة *</label>
+                            <select asp-for="City" class="form-control">
+                                <option value="">-- اختر المدينة --</option>
+                                <option value="القاهرة">القاهرة</option>
+                                <option value="الإسكندرية">الإسكندرية</option>
+                                <option value="الجيزة">الجيزة</option>
+                                <option value="الشرقية">الشرقية</option>
+                                <option value="الدقهلية">الدقهلية</option>
+                                <option value="البحيرة">البحيرة</option>
+                                <option value="المنوفية">المنوفية</option>
+                                <option value="القليوبية">القليوبية</option>
+                                <option value="أسيوط">أسيوط</option>
+                                <option value="سوهاج">سوهاج</option>
+                                <option value="المنيا">المنيا</option>
+                                <option value="بني سويف">بني سويف</option>
+                                <option value="الفيوم">الفيوم</option>
+                                <option value="قنا">قنا</option>
+                                <option value="الأقصر">الأقصر</option>
+                                <option value="أسوان">أسوان</option>
+                                <option value="بورسعيد">بورسعيد</option>
+                                <option value="السويس">السويس</option>
+                                <option value="الإسماعيلية">الإسماعيلية</option>
+                            </select>
+                            <span asp-validation-for="City" class="form-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">العنوان التفصيلي *</label>
+                            <input asp-for="Address" class="form-control"
+                                   placeholder="مثال: المنطقة الصناعية، مدينة نصر" />
+                            <span asp-validation-for="Address" class="form-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">خط العرض (Latitude)</label>
+                            <input asp-for="Latitude" class="form-control"
+                                   type="number" step="0.0001" placeholder="30.0444" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">خط الطول (Longitude)</label>
+                            <input asp-for="Longitude" class="form-control"
+                                   type="number" step="0.0001" placeholder="31.2357" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="form-actions">
+                    <a asp-controller="Equipment" asp-action="MyEquipments" class="btn-outline">إلغاء</a>
+                    <button type="submit" class="btn-primary">🏗 إضافة المعدة</button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- ===== TIPS SIDEBAR ===== -->
+        <div class="create-tips">
+            <div class="tips-card">
+                <div class="tips-title">💡 نصائح لإعلان ناجح</div>
+                <div class="tip-item">
+                    <div class="tip-icon">📝</div>
+                    <div>
+                        <div class="tip-title">وصف واضح ومفصل</div>
+                        <div class="tip-desc">كلما كان الوصف أوضح، زادت فرص الحجز</div>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-icon">💰</div>
+                    <div>
+                        <div class="tip-title">سعر تنافسي</div>
+                        <div class="tip-desc">قارن الأسعار في منطقتك لتحديد السعر المناسب</div>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-icon">📍</div>
+                    <div>
+                        <div class="tip-title">موقع دقيق</div>
+                        <div class="tip-desc">العنوان الدقيق يساعد المستأجرين على اتخاذ قرار أسرع</div>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-icon">🔧</div>
+                    <div>
+                        <div class="tip-title">صيانة منتظمة</div>
+                        <div class="tip-desc">المعدات المصانة تحصل على تقييمات أعلى</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tips-card" style="margin-top:1.5rem">
+                <div class="tips-title">📊 إحصائيات المنصة</div>
+                <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem">
+                    <div style="display:flex; justify-content:space-between; font-size:0.875rem">
+                        <span style="color:var(--muted)">متوسط وقت الحجز</span>
+                        <span style="color:var(--gold); font-weight:700">2.3 يوم</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.875rem">
+                        <span style="color:var(--muted)">معدل الإشغال</span>
+                        <span style="color:var(--gold); font-weight:700">72%</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.875rem">
+                        <span style="color:var(--muted)">متوسط الدخل الشهري</span>
+                        <span style="color:var(--gold); font-weight:700">12,500 ج.م</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

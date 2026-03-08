@@ -1,5 +1,181 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HeavyEquipment.Application.Features.Equipments.Dto.EquipmentDto
 @{
+    ViewData["Title"] = Model.Name;
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "equipment";
 }
+
+<div class="details-page">
+
+    <!-- ===== BREADCRUMB ===== -->
+    <div class="breadcrumb-bar">
+        <a asp-controller="Home" asp-action="Index">الرئيسية</a>
+        <span>←</span>
+        <a asp-controller="Equipment" asp-action="Index">المعدات</a>
+        <span>←</span>
+        <span class="breadcrumb-current">@Model.Name</span>
+    </div>
+
+    <div class="details-layout">
+
+        <!-- ===== RIGHT COLUMN — Main Info ===== -->
+        <div class="details-main">
+
+            <!-- Image / Icon Section -->
+            <div class="details-image-section">
+                <div class="details-image">
+                    @switch (Model.Category)
+                    {
+                        case "Crane":
+                            <text>🏗</text>
+                            break;
+                        case "Excavator":
+                            <text>🚜</text>
+                            break;
+                        case "Generator":
+                            <text>⚡</text>
+                            break;
+                        case "Bulldozer":
+                            <text>🚧</text>
+                            break;
+                        default:
+                            <text>🔧</text>
+                            break;
+                    }
+                </div>
+                <div class="details-image-overlay">
+                    <span class="badge badge-gold">@Model.Category</span>
+                    <span class="badge @(Model.Status == "Available" ? "badge-green" : "badge-muted")">
+                        @(Model.Status == "Available" ? "✅ متاح الآن" : "⏳ مؤجر حالياً")
+                    </span>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="details-info-card">
+                <h1 class="details-title">@Model.Name</h1>
+                <div class="details-location">📍 @Model.City — @Model.Address</div>
+
+                <div class="details-specs-grid">
+                    <div class="spec-item">
+                        <div class="spec-label">الموديل</div>
+                        <div class="spec-value">@Model.Model</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">سنة الصنع</div>
+                        <div class="spec-value">@Model.ManufactureYear</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">ساعات التشغيل</div>
+                        <div class="spec-value">@Model.TotalHoursOperated.ToString("N0") ساعة</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">الصيانة القادمة</div>
+                        <div class="spec-value">@Model.NextMaintenanceThreshold.ToString("N0") ساعة</div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="details-description">
+                        <div class="details-section-title">تفاصيل المعدة</div>
+                        <p>@Model.Description</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Owner Info -->
+            <div class="owner-card">
+                <div class="details-section-title">🧑‍💼 معلومات المالك</div>
+                <div class="owner-info">
+                    <div class="owner-avatar">@Model.OwnerName?[0]</div>
+                    <div>
+                        <div class="owner-name">@Model.OwnerName</div>
+                        <div class="owner-trust">
+                            ⭐ Trust Score:
+                            <span style="color:var(--gold); font-weight:700">@Model.OwnerTrustScore / 100</span>
+                        </div>
+                    </div>
+                    @if (Model.OwnerIsVerified)
+                    {
+                        <div class="badge badge-green" style="margin-right:auto">✅ موثق</div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== LEFT COLUMN — Booking Card ===== -->
+        <div class="details-sidebar">
+            <div class="booking-card">
+                <div class="booking-card-header">
+                    <div class="booking-price-label">السعر / ساعة</div>
+                    <div class="booking-price">
+                        <span class="booking-price-value">@Model.HourlyRate.ToString("N0")</span>
+                        <span class="booking-price-currency">ج.م</span>
+                    </div>
+                    <div class="booking-deposit">
+                        التأمين المطلوب:
+                        <strong style="color:var(--gold)">@Model.DepositAmount.ToString("N0") ج.م</strong>
+                    </div>
+                </div>
+
+                @if (Model.Status == "Available")
+                {
+                    @if (User.Identity!.IsAuthenticated && User.IsInRole("Customer"))
+                    {
+                        <a asp-controller="RentalOrder"
+                           asp-action="Create"
+                           asp-route-equipmentId="@Model.Id"
+                           class="btn-primary btn-full booking-btn">
+                            🏗 احجز دلوقتي
+                        </a>
+                    }
+                    else if (!User.Identity!.IsAuthenticated)
+                    {
+                        <a asp-controller="Account"
+                           asp-action="Login"
+                           asp-route-returnUrl="@Context.Request.Path"
+                           class="btn-primary btn-full booking-btn">
+                            سجّل دخولك للحجز
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            ⚠️ المالكون لا يمكنهم استئجار المعدات
+                        </div>
+                    }
+                }
+                else
+                {
+                    <button class="btn-outline btn-full" disabled style="opacity:0.5; cursor:not-allowed">
+                        ⏳ غير متاح حالياً
+                    </button>
+                }
+
+                <div class="booking-features">
+                    <div class="booking-feature">✅ تأمين شامل مشمول</div>
+                    <div class="booking-feature">✅ فحص قبل التسليم</div>
+                    <div class="booking-feature">✅ دعم على مدار الساعة</div>
+                    <div class="booking-feature">✅ إلغاء مجاني خلال 24 ساعة</div>
+                </div>
+            </div>
+
+            <!-- Location Card -->
+            <div class="location-card">
+                <div class="details-section-title">📍 الموقع</div>
+                <div class="location-details">
+                    <div><strong>المدينة:</strong> @Model.City</div>
+                    <div><strong>العنوان:</strong> @Model.Address</div>
+                    @if (Model.Latitude != 0 && Model.Longitude != 0)
+                    {
+                        <div style="margin-top:0.5rem; font-size:0.8rem; color:var(--muted)">
+                            @Model.Latitude.ToString("F4")°N, @Model.Longitude.ToString("F4")°E
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

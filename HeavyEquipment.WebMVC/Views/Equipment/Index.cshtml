@@ -1,5 +1,205 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HeavyEquipment.Application.Common.Models.PaginatedResult<HeavyEquipment.Application.Features.Equipments.Dto.EquipmentSummaryDto>
 @{
+    ViewData["Title"] = "تصفح المعدات";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "equipment";
 }
+
+<div class="equipment-page">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">EQUIPMENT</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">تصفح المعدات المتاحة</h1>
+            <p class="page-header-desc">اعثر على المعدة المناسبة لمشروعك من بين مئات الخيارات المتاحة</p>
+        </div>
+    </div>
+
+    <div class="equipment-layout">
+
+        <!-- ===== FILTERS SIDEBAR ===== -->
+        <aside class="filters-sidebar">
+            <div class="filters-card">
+                <div class="filters-title">🔍 تصفية النتائج</div>
+
+                <form asp-action="Index" asp-controller="Equipment" method="get" id="filterForm">
+
+                    <!-- Category -->
+                    <div class="filter-group">
+                        <div class="filter-label">نوع المعدة</div>
+                        <div class="filter-options">
+                            <label class="filter-option @(ViewBag.SelectedCategory == null ? "active" : "")">
+                                <input type="radio" name="category" value=""
+                                @(ViewBag.SelectedCategory == null ? "checked" : "")
+                                       onchange="this.form.submit()" />
+                                الكل
+                            </label>
+                            @foreach (var cat in new[] {
+                            ("Crane", "🏗 أوناش"),
+                            ("Excavator", "🚜 جرافات"),
+                            ("Generator", "⚡ مولدات"),
+                            ("Bulldozer", "🚧 بلدوزر"),
+                            ("Forklift", "🔧 رافعة شوكية"),
+                            ("Loader", "🚛 لودر")
+                            })
+                            {
+                                <label class="filter-option @(ViewBag.SelectedCategory?.ToString() == cat.Item1 ? "active" : "")">
+                                    <input type="radio" name="category" value="@cat.Item1"
+                                    @(ViewBag.SelectedCategory?.ToString() == cat.Item1 ? "checked" : "")
+                                           onchange="this.form.submit()" />
+                                    @cat.Item2
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- City -->
+                    <div class="filter-group">
+                        <div class="filter-label">المدينة</div>
+                        <input type="text"
+                               name="city"
+                               class="form-control"
+                               placeholder="مثال: القاهرة"
+                               value="@ViewBag.SelectedCity" />
+                    </div>
+
+                    <!-- Date Range -->
+                    <div class="filter-group">
+                        <div class="filter-label">تاريخ البدء</div>
+                        <input type="date"
+                               name="from"
+                               class="form-control"
+                               value="@(ViewBag.From?.ToString("yyyy-MM-dd") ?? DateTime.Today.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="filter-group">
+                        <div class="filter-label">تاريخ الانتهاء</div>
+                        <input type="date"
+                               name="to"
+                               class="form-control"
+                               value="@(ViewBag.To?.ToString("yyyy-MM-dd") ?? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-full" style="margin-top:0.5rem">
+                        تطبيق الفلتر
+                    </button>
+
+                    <a asp-action="Index" asp-controller="Equipment"
+                       style="display:block; text-align:center; margin-top:0.8rem; font-size:0.85rem; color:var(--muted); text-decoration:none;">
+                        إعادة تعيين ↺
+                    </a>
+
+                </form>
+            </div>
+        </aside>
+
+        <!-- ===== EQUIPMENT GRID ===== -->
+        <div class="equipment-results">
+
+            <!-- Results Header -->
+            <div class="results-header">
+                <div class="results-count">
+                    <span class="count-number">@Model.TotalCount</span> معدة متاحة
+                </div>
+                @if (User.IsInRole("Owner"))
+                {
+                    <a asp-controller="Equipment" asp-action="Create" class="btn-primary btn-sm">
+                        + إضافة معدة
+                    </a>
+                }
+            </div>
+
+            @if (!Model.Items.Any())
+            {
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <div class="empty-title">لا توجد معدات متاحة</div>
+                    <div class="empty-desc">جرّب تغيير معايير البحث أو الفترة الزمنية</div>
+                    <a asp-action="Index" asp-controller="Equipment" class="btn-outline" style="margin-top:1.5rem">
+                        عرض كل المعدات
+                    </a>
+                </div>
+            }
+            else
+            {
+                <!-- Equipment Cards -->
+                <div class="eq-grid">
+                    @foreach (var item in Model.Items)
+                    {
+                        <a asp-controller="Equipment" asp-action="Details" asp-route-id="@item.Id" class="eq-card">
+                            <div class="eq-card-image">
+                                @switch (item.Category)
+                                {
+                                    case "Crane":
+                                        <text>🏗</text>
+                                        break;
+                                    case "Excavator":
+                                        <text>🚜</text>
+                                        break;
+                                    case "Generator":
+                                        <text>⚡</text>
+                                        break;
+                                    case "Bulldozer":
+                                        <text>🚧</text>
+                                        break;
+                                    default:
+                                        <text>🔧</text>
+                                        break;
+                                }
+                                <div class="eq-card-badge">@item.Category</div>
+                                <div class="eq-status-dot @(item.Status == "Available" ? "available" : "rented")"></div>
+                            </div>
+                            <div class="eq-card-body">
+                                <div class="eq-card-name">@item.Name</div>
+                                <div class="eq-card-location">📍 @item.City</div>
+                                <div class="eq-card-footer">
+                                    <div>
+                                        <div class="eq-price">@item.HourlyRate.ToString("N0")</div>
+                                        <div class="eq-price-unit">ج.م / ساعة</div>
+                                    </div>
+                                    <div class="eq-card-action">عرض التفاصيل ←</div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <div class="pagination">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <a asp-action="Index"
+                               asp-route-page="@(Model.PageNumber - 1)"
+                               asp-route-category="@ViewBag.SelectedCategory"
+                               asp-route-city="@ViewBag.SelectedCity"
+                               class="page-btn">← السابق</a>
+                        }
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <a asp-action="Index"
+                               asp-route-page="@i"
+                               asp-route-category="@ViewBag.SelectedCategory"
+                               asp-route-city="@ViewBag.SelectedCity"
+                               class="page-btn @(i == Model.PageNumber ? "active" : "")">@i</a>
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <a asp-action="Index"
+                               asp-route-page="@(Model.PageNumber + 1)"
+                               asp-route-category="@ViewBag.SelectedCategory"
+                               asp-route-city="@ViewBag.SelectedCity"
+                               class="page-btn">التالي →</a>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

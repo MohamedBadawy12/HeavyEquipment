@@ -1,5 +1,207 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IReadOnlyList<HeavyEquipment.Application.Features.Equipments.Dto.EquipmentSummaryDto>
 @{
+    ViewData["Title"] = "معداتي";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "equipment";
+}
+
+<div class="myequip-page">
+
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">MY EQUIPMENT</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">معداتي</h1>
+            <p class="page-header-desc">إدارة وتتبع جميع معداتك المسجلة على المنصة</p>
+        </div>
+        <a asp-controller="Equipment" asp-action="Create" class="btn-primary">
+            + إضافة معدة جديدة
+        </a>
+    </div>
+
+    <!-- ===== STATS BAR ===== -->
+    <div class="myequip-stats">
+        <div class="myequip-stat">
+            <div class="myequip-stat-value">@Model.Count</div>
+            <div class="myequip-stat-label">إجمالي المعدات</div>
+        </div>
+        <div class="myequip-stat">
+            <div class="myequip-stat-value" style="color:var(--green)">
+                @Model.Count(e => e.Status == "Available")
+            </div>
+            <div class="myequip-stat-label">متاحة الآن</div>
+        </div>
+        <div class="myequip-stat">
+            <div class="myequip-stat-value" style="color:var(--gold)">
+                @Model.Count(e => e.Status == "Rented")
+            </div>
+            <div class="myequip-stat-label">مؤجرة حالياً</div>
+        </div>
+        <div class="myequip-stat">
+            <div class="myequip-stat-value" style="color:var(--muted)">
+                @Model.Count(e => e.Status == "UnderMaintenance")
+            </div>
+            <div class="myequip-stat-label">تحت الصيانة</div>
+        </div>
+    </div>
+
+    <!-- ===== EQUIPMENT TABLE ===== -->
+    @if (!Model.Any())
+    {
+        <div class="empty-state" style="margin: 3rem 4rem;">
+            <div class="empty-icon">🏗</div>
+            <div class="empty-title">لا توجد معدات مسجلة بعد</div>
+            <div class="empty-desc">أضف أول معدة الآن وابدأ في تحقيق الدخل</div>
+            <a asp-controller="Equipment" asp-action="Create" class="btn-primary" style="margin-top:1.5rem">
+                + إضافة معدة جديدة
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="myequip-table-wrapper">
+            <table class="myequip-table">
+                <thead>
+                    <tr>
+                        <th>المعدة</th>
+                        <th>النوع</th>
+                        <th>الموقع</th>
+                        <th>السعر / ساعة</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- Name -->
+                            <td>
+                                <div class="equip-name-cell">
+                                    <div class="equip-icon-small">
+                                        @switch (item.Category)
+                                        {
+                                            case "Crane":
+                                                <text>🏗</text>
+                                                break;
+                                            case "Excavator":
+                                                <text>🚜</text>
+                                                break;
+                                            case "Generator":
+                                                <text>⚡</text>
+                                                break;
+                                            case "Bulldozer":
+                                                <text>🚧</text>
+                                                break;
+                                            default:
+                                                <text>🔧</text>
+                                                break;
+                                        }
+                                    </div>
+                                    <div>
+                                        <div class="equip-name">@item.Name</div>
+                                        <div class="equip-id">#@item.Id.ToString()[..8]</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Category -->
+                            <td>
+                                <span class="badge badge-gold">@item.Category</span>
+                            </td>
+
+                            <!-- Location -->
+                            <td class="equip-location">📍 @item.City</td>
+
+                            <!-- Price -->
+                            <td>
+                                <span class="equip-price">@item.HourlyRate.ToString("N0")</span>
+                                <span style="color:var(--muted); font-size:0.75rem"> ج.م</span>
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                @{
+                                    var (statusClass, statusLabel) = item.Status switch
+                                    {
+                                        "Available" => ("badge-green", "✅ متاح"),
+                                        "Rented" => ("badge-gold", "⏳ مؤجر"),
+                                        "UnderMaintenance" => ("badge-muted", "🔧 صيانة"),
+                                        "Inactive" => ("badge-red", "⛔ غير نشط"),
+                                        _ => ("badge-muted", item.Status)
+                                    };
+                                }
+                                <span class="badge @statusClass">@statusLabel</span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td>
+                                <div class="equip-actions">
+                                    <a asp-controller="Equipment"
+                                       asp-action="Details"
+                                       asp-route-id="@item.Id"
+                                       class="action-btn action-view" title="عرض">👁</a>
+
+                                    <!-- Update Status Dropdown -->
+                                    <div class="status-dropdown-wrapper">
+                                        <button class="action-btn action-edit"
+                                                onclick="toggleDropdown('@item.Id')"
+                                                title="تغيير الحالة">
+                                            ⚙
+                                        </button>
+
+                                        <div class="status-dropdown" id="dropdown-@item.Id">
+                                            @foreach (var status in new[] {
+                                    ("Available", "✅ متاح"),
+                                    ("Rented", "⏳ مؤجر"),
+                                    ("UnderMaintenance", "🔧 صيانة"),
+                                    ("Inactive", "⛔ غير نشط")
+                                    })
+                                            {
+                                                if (status.Item1 != item.Status)
+                                                {
+                                                    <form asp-action="UpdateStatus"
+                                                          asp-controller="Equipment"
+                                                          method="post"
+                                                          style="margin:0">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="equipmentId" value="@item.Id" />
+                                                        <input type="hidden" name="newStatus" value="@status.Item1" />
+                                                        <button type="submit" class="status-option">
+                                                            @status.Item2
+                                                        </button>
+                                                    </form>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <script>
+        function toggleDropdown(id) {
+            // أغلق كل الـ Dropdowns الأخرى
+            document.querySelectorAll('.status-dropdown').forEach(d => {
+                if (d.id !== 'dropdown-' + id) d.classList.remove('open');
+            });
+            document.getElementById('dropdown-' + id).classList.toggle('open');
+        }
+
+        // أغلق الـ Dropdown لو الـ User ضغط برا
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.status-dropdown-wrapper')) {
+                document.querySelectorAll('.status-dropdown').forEach(d => d.classList.remove('open'));
+            }
+        });
+    </script>
 }

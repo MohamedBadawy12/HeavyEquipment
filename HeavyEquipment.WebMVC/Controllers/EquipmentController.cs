@@ -86,7 +86,7 @@ namespace HeavyEquipment.WebMVC.Controllers
         public async Task<IActionResult> MyEquipments()
         {
             var result = await _mediator.Send(
-                new GetEquipmentByIdQuery(CurrentUserId));
+                new GetEquipmentsByOwnerQuery(CurrentUserId));
 
             return View(result);
         }
