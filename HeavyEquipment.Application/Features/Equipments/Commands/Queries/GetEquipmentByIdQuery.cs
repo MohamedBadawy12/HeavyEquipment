@@ -23,8 +23,10 @@ namespace HeavyEquipment.Application.Features.Equipments.Commands.Queries
                 e.Id, e.Name, e.Description, e.Model,
                 e.ManufactureYear, e.Category.ToString(),
                 e.Status.ToString(), e.HourlyRate, e.DepositAmount,
+                e.TotalHoursOperated, e.NextMaintenanceThreshold, e.PhotoUrls.ToList(),
                 e.CurrentLocation.City, e.CurrentLocation.Address,
-                e.Owner?.FullName ?? "", e.PhotoUrls);
+                e.CurrentLocation.Latitude, e.CurrentLocation.Longitude, e.OwnerId,
+                e.Owner?.FullName ?? "", e.Owner.TrustScore, e.Owner.IsVerified);
 
             return Result<EquipmentDto>.Success(dto);
         }
