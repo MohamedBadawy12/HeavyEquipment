@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\Home.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\css\Rental.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HeavyEquipment.Application\HeavyEquipment.Application.csproj" />
+    <ProjectReference Include="..\HeavyEquipment.Domain\HeavyEquipment.Domain.csproj" />
     <ProjectReference Include="..\HeavyEquipment.Infrastructure\HeavyEquipment.Infrastructure.csproj" />
   </ItemGroup>
 

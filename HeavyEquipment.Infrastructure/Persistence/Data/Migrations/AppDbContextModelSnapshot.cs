@@ -699,7 +699,7 @@ namespace HeavyEquipment.Infrastructure.Persistence.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("HeavyEquipment.Domain.ValueObjects.Location", "CurrentLocation", b1 =>
+                    b.OwnsOne("HeavyEquipment.Domain.Entities.Equipment.CurrentLocation#HeavyEquipment.Domain.ValueObjects.Location", "CurrentLocation", b1 =>
                         {
                             b1.Property<Guid>("EquipmentId")
                                 .HasColumnType("uniqueidentifier");
@@ -726,7 +726,7 @@ namespace HeavyEquipment.Infrastructure.Persistence.Data.Migrations
 
                             b1.HasKey("EquipmentId");
 
-                            b1.ToTable("Equipments");
+                            b1.ToTable("Equipments", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("EquipmentId");

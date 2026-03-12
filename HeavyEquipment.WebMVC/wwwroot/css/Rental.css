@@ -1,0 +1,397 @@
+﻿/* ===================================================
+   HeavyHub — Rental Order Pages Styles
+   File: wwwroot/css/rental.css
+=================================================== */
+
+.rental-page {
+    padding-bottom: 4rem;
+}
+
+/* ===== STATS BAR ===== */
+.orders-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 0 4rem 2rem;
+    border: 1px solid var(--border);
+}
+
+.orders-stat {
+    padding: 1.5rem 2rem;
+    border-left: 1px solid var(--border);
+    text-align: center;
+}
+
+    .orders-stat:last-child {
+        border-left: none;
+    }
+
+.orders-stat-value {
+    font-family: var(--font-en);
+    font-size: 2.2rem;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
+.orders-stat-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+/* ===== ORDERS CONTAINER ===== */
+.orders-container {
+    padding: 0 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* ===== ORDER CARD ===== */
+.order-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.3s;
+}
+
+    .order-card:hover {
+        border-color: rgba(212,168,67,0.3);
+    }
+
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--dark);
+}
+
+.order-equip-info {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.order-equip-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #1a1d24, #0f1115);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.order-equip-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.order-id {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: monospace;
+}
+
+.order-card-body {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    padding: 1.2rem 1.5rem;
+}
+
+.order-detail {
+    padding: 0 1rem;
+    border-left: 1px solid var(--border);
+}
+
+    .order-detail:first-child {
+        padding-right: 0;
+    }
+
+    .order-detail:last-child {
+        border-left: none;
+    }
+
+.order-detail-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.3rem;
+}
+
+.order-detail-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.order-price {
+    color: var(--gold);
+    font-family: var(--font-en);
+    font-size: 1.1rem;
+}
+
+.order-card-footer {
+    display: flex;
+    gap: 0.8rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: rgba(255,255,255,0.01);
+}
+
+/* ===== STATUS BADGES ===== */
+.order-status {
+    padding: 0.35rem 0.9rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+}
+
+.status-pending {
+    background: rgba(122,125,133,0.1);
+    color: var(--muted);
+    border-color: rgba(122,125,133,0.3);
+}
+
+.status-confirmed {
+    background: rgba(212,168,67,0.1);
+    color: var(--gold);
+    border-color: rgba(212,168,67,0.3);
+}
+
+.status-active {
+    background: rgba(76,175,80,0.1);
+    color: #4CAF50;
+    border-color: rgba(76,175,80,0.3);
+}
+
+.status-completed {
+    background: rgba(33,150,243,0.1);
+    color: #2196F3;
+    border-color: rgba(33,150,243,0.3);
+}
+
+.status-cancelled {
+    background: rgba(192,57,43,0.1);
+    color: var(--red);
+    border-color: rgba(192,57,43,0.3);
+}
+
+.status-disputed {
+    background: rgba(255,152,0,0.1);
+    color: #FF9800;
+    border-color: rgba(255,152,0,0.3);
+}
+
+/* ===== DETAILS — ORDER HEADER CARD ===== */
+.order-header-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 2rem;
+}
+
+.order-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.order-ref {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    font-family: monospace;
+}
+
+.order-equip-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+/* ===== TIMELINE ===== */
+.order-timeline {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+}
+
+.timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.timeline-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--dark);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    z-index: 1;
+    transition: all 0.3s;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-step.done .timeline-dot {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--black);
+}
+
+.timeline-step.current .timeline-dot {
+    background: transparent;
+    border-color: var(--gold);
+    color: var(--gold);
+    box-shadow: 0 0 0 4px rgba(212,168,67,0.15);
+}
+
+.timeline-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: center;
+}
+
+.timeline-step.done .timeline-label,
+.timeline-step.current .timeline-label {
+    color: var(--white);
+}
+
+.timeline-line {
+    position: absolute;
+    top: 16px;
+    left: calc(-50% + 16px);
+    width: calc(100% - 32px);
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+}
+
+    .timeline-line.done {
+        background: var(--gold);
+    }
+
+/* ===== RENTAL DETAILS GRID ===== */
+.rental-details-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    padding-top: 1rem;
+}
+
+.rental-detail-item {
+}
+
+.rental-detail-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.5px;
+}
+
+.rental-detail-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* ===== OWNER ACTIONS ===== */
+.owner-actions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+/* ===== CREATE — PRICE PREVIEW ===== */
+.price-preview {
+    background: var(--dark);
+    border: 1px solid rgba(212,168,67,0.3);
+    padding: 1.2rem 1.5rem;
+    margin-top: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.price-preview-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+.price-preview-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--border);
+    font-weight: 700;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .orders-stats {
+        margin: 0 2rem 2rem;
+    }
+
+    .orders-container {
+        padding: 0 2rem;
+    }
+
+    .order-card-body {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .rental-details-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .orders-stats {
+        margin: 0 1rem 1.5rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .orders-container {
+        padding: 0 1rem;
+    }
+
+    .order-card-body {
+        grid-template-columns: 1fr;
+    }
+
+    .order-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+
+    .rental-details-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .order-timeline {
+        overflow-x: auto;
+    }
+}

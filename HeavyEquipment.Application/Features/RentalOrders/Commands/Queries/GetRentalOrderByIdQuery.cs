@@ -28,7 +28,11 @@ namespace HeavyEquipment.Application.Features.RentalOrders.Commands.Queries
                 order.Insurance is not null,
                 order.LogisticsProvider?.CompanyName,
                 order.Inspections.Count,
-                order.Reviews.Count);
+                order.Reviews.Count,
+                order.EquipmentId,
+                order.HourlyRate,
+                order.CancellationReason,
+                order.DisputeReason);
 
             return Result<RentalOrderDto>.Success(dto);
         }

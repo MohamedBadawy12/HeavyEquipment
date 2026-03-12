@@ -41,6 +41,8 @@ namespace HeavyEquipment.Domain.Entities
                 throw new DomainException("تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء");
             if (start < DateTime.UtcNow.Date)
                 throw new DomainException("لا يمكن الحجز في تاريخ ماضٍ");
+            if (start < DateTime.UtcNow.Date.AddYears(-1))
+                throw new DomainException("لا يمكن الحجز في تاريخ ماضٍ");
             if (hourlyRate <= 0)
                 throw new DomainException("السعر غير صحيح");
 
