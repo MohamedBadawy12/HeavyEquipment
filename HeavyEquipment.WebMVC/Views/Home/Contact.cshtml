@@ -1,5 +1,92 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "تواصل معنا";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "pages";
 }
+
+<div class="inner-page">
+
+    <div class="inner-hero">
+        <div class="section-label">CONTACT US</div>
+        <div class="gold-divider" style="margin:0.5rem auto"></div>
+        <h1 class="inner-hero-title">تواصل معنا</h1>
+        <p class="inner-hero-desc">فريقنا مستعد للمساعدة على مدار الساعة</p>
+    </div>
+
+    <div class="contact-layout">
+
+        <!-- CONTACT INFO -->
+        <div class="contact-info">
+            <div class="contact-info-card">
+                <div class="contact-item">
+                    <div class="contact-item-icon">📧</div>
+                    <div>
+                        <div class="contact-item-label">البريد الإلكتروني</div>
+                        <div class="contact-item-value">support@heavyhub.eg</div>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-icon">📞</div>
+                    <div>
+                        <div class="contact-item-label">الهاتف</div>
+                        <div class="contact-item-value" dir="ltr">+20 100 000 0000</div>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-icon">📍</div>
+                    <div>
+                        <div class="contact-item-label">العنوان</div>
+                        <div class="contact-item-value">القاهرة، مصر الجديدة</div>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-icon">🕒</div>
+                    <div>
+                        <div class="contact-item-label">ساعات العمل</div>
+                        <div class="contact-item-value">السبت — الخميس، 9ص — 6م</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT FORM -->
+        <div class="create-form-wrapper">
+            <div class="form-section-title" style="margin-bottom:1.5rem">
+                <span class="form-section-num">✉</span>
+                أرسل رسالة
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">الاسم</label>
+                    <input type="text" class="form-control" placeholder="اسمك الكامل" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" class="form-control" placeholder="example@email.com" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">الموضوع</label>
+                <select class="form-control">
+                    <option value="">-- اختر الموضوع --</option>
+                    <option>مشكلة في الحساب</option>
+                    <option>استفسار عن إيجار</option>
+                    <option>شكوى</option>
+                    <option>اقتراح</option>
+                    <option>أخرى</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">الرسالة</label>
+                <textarea class="form-control" rows="5" placeholder="اكتب رسالتك هنا..."></textarea>
+            </div>
+
+            <button type="button" class="btn-primary" style="width:100%; padding:1rem">
+                إرسال الرسالة
+            </button>
+        </div>
+    </div>
+</div>

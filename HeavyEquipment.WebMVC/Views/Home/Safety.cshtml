@@ -1,5 +1,51 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "السلامة";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "pages";
 }
+
+<div class="inner-page">
+    <div class="inner-hero">
+        <div class="section-label">SAFETY</div>
+        <div class="gold-divider" style="margin:0.5rem auto"></div>
+        <h1 class="inner-hero-title">السلامة أولاً</h1>
+        <p class="inner-hero-desc">إرشادات السلامة لضمان استخدام آمن للمعدات الثقيلة</p>
+    </div>
+
+    <div class="content-layout">
+        <div class="content-card">
+            <div class="content-section">
+                <div class="content-section-icon">⛑️</div>
+                <h2 class="content-section-title">قبل استلام المعدة</h2>
+                <div class="content-list">
+                    <div class="content-list-item">🔍 تفقد حالة المعدة بالكامل مع المفتش المعتمد</div>
+                    <div class="content-list-item">📋 راجع تقرير الفحص وتأكد من توقيعه</div>
+                    <div class="content-list-item">📸 وثّق حالة المعدة بالصور قبل الاستخدام</div>
+                    <div class="content-list-item">📖 اقرأ دليل التشغيل إذا كنت غير ملم بالمعدة</div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div class="content-section-icon">🦺</div>
+                <h2 class="content-section-title">أثناء الاستخدام</h2>
+                <div class="content-list">
+                    <div class="content-list-item">👷 ارتدِ معدات الحماية الشخصية دائماً</div>
+                    <div class="content-list-item">🚫 لا تتجاوز الحمولة القصوى للمعدة</div>
+                    <div class="content-list-item">⚠️ تأكد من خلو منطقة العمل من الأشخاص</div>
+                    <div class="content-list-item">🔋 راقب مؤشرات الوقود والحرارة بانتظام</div>
+                    <div class="content-list-item">📵 لا تشغّل المعدة تحت تأثير أي مؤثرات</div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div class="content-section-icon">🚨</div>
+                <h2 class="content-section-title">في حالة الطوارئ</h2>
+                <p class="content-text">
+                    في حالة وقوع حادث أو عطل مفاجئ، أوقف تشغيل المعدة فوراً
+                    وتواصل مع فريق الدعم على الرقم الطارئ:
+                    <strong style="color:var(--gold)" dir="ltr">+20 100 000 0001</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

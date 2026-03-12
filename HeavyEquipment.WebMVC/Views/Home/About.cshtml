@@ -1,5 +1,84 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "عن المنصة";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "pages";
 }
+
+<div class="inner-page">
+
+    <div class="inner-hero">
+        <div class="section-label">ABOUT US</div>
+        <div class="gold-divider" style="margin:0.5rem auto"></div>
+        <h1 class="inner-hero-title">عن HeavyHub</h1>
+        <p class="inner-hero-desc">منصة التداول التشاركي للمعدات الثقيلة في مصر والشرق الأوسط</p>
+    </div>
+
+    <!-- MISSION -->
+    <div class="about-mission">
+        <div class="about-mission-content">
+            <div class="section-label">OUR MISSION</div>
+            <div class="gold-divider"></div>
+            <h2 class="about-mission-title">مهمتنا</h2>
+            <p class="about-mission-text">
+                نؤمن بأن كل مقاول يستحق الوصول إلى المعدات الثقيلة بأسعار عادلة وبدون تعقيدات.
+                HeavyHub تربط أصحاب المعدات بالمقاولين في منصة واحدة آمنة وموثوقة،
+                مما يساعد على تقليل التكاليف وزيادة الإنتاجية في قطاع البناء والإنشاء.
+            </p>
+        </div>
+        <div class="about-stats-grid">
+            <div class="about-stat">
+                <div class="about-stat-num">500+</div>
+                <div class="about-stat-label">معدة مسجلة</div>
+            </div>
+            <div class="about-stat">
+                <div class="about-stat-num">120+</div>
+                <div class="about-stat-label">مالك موثوق</div>
+            </div>
+            <div class="about-stat">
+                <div class="about-stat-num">1,200+</div>
+                <div class="about-stat-label">صفقة ناجحة</div>
+            </div>
+            <div class="about-stat">
+                <div class="about-stat-num">19</div>
+                <div class="about-stat-label">محافظة مصرية</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VALUES -->
+    <div class="about-values">
+        <div style="text-align:center; margin-bottom:3rem">
+            <div class="section-label">OUR VALUES</div>
+            <div class="gold-divider" style="margin:0.5rem auto"></div>
+            <h2 class="section-title">قيمنا</h2>
+        </div>
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-icon">🔒</div>
+                <h3 class="value-title">الأمان والثقة</h3>
+                <p class="value-desc">كل المستخدمين موثقون، وكل المعدات مفحوصة ومؤمنة قبل كل إيجار</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">⚡</div>
+                <h3 class="value-title">السرعة والكفاءة</h3>
+                <p class="value-desc">من البحث للحجز للتسليم — كل شيء رقمي وسريع بدون بيروقراطية</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">🤝</div>
+                <h3 class="value-title">الشراكة الحقيقية</h3>
+                <p class="value-desc">نحن لسنا وسيطاً — نحن شريك نجاح لكل من المالك والمستأجر</p>
+            </div>
+            <div class="value-card">
+                <div class="value-icon">📈</div>
+                <h3 class="value-title">النمو المستدام</h3>
+                <p class="value-desc">نساعد أصحاب المعدات على تحقيق دخل ثابت وتشغيل معداتهم بكفاءة أعلى</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="inner-cta">
+        <h2 class="inner-cta-title">انضم إلى المجتمع</h2>
+        <p class="inner-cta-desc">سواء كنت مالكاً أو مستأجراً، مكانك هنا</p>
+        <a asp-controller="Account" asp-action="Register" class="btn-primary">إنشاء حساب مجاناً</a>
+    </div>
+</div>

@@ -1,5 +1,71 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "الأسئلة الشائعة";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "pages";
+}
+
+<div class="inner-page">
+
+    <div class="inner-hero">
+        <div class="section-label">FAQ</div>
+        <div class="gold-divider" style="margin:0.5rem auto"></div>
+        <h1 class="inner-hero-title">الأسئلة الشائعة</h1>
+        <p class="inner-hero-desc">إجابات على أكثر الأسئلة التي يطرحها مستخدمونا</p>
+    </div>
+
+    <div class="faq-container">
+
+        @{
+            var faqs = new[]
+            {
+        ("للمستأجرين", new[]
+        {
+        ("كيف أحجز معدة؟", "ابحث عن المعدة المناسبة، اضغط على احجز الآن، حدد الفترة الزمنية وأرسل الطلب. سيتم تأكيده من المالك خلال 24 ساعة."),
+        ("هل المعدات مؤمنة؟", "نعم، جميع المعدات مؤمنة تأميناً شاملاً طوال فترة الإيجار. في حالة أي حادثة، يتم التعامل معها عبر بوليصة التأمين."),
+        ("ماذا يحدث لو تأخرت في إعادة المعدة؟", "يتم احتساب رسوم إضافية بنفس سعر الساعة المتفق عليه. يُنصح بالتواصل مع المالك مسبقاً لتمديد فترة الإيجار."),
+        ("هل يمكنني إلغاء الطلب؟", "يمكنك الإلغاء مجاناً قبل 24 ساعة من موعد البدء. بعد ذلك قد يُطبق رسم إلغاء."),
+        }),
+        ("للملاك", new[]
+        {
+        ("كيف أضيف معدتي؟", "سجّل حساباً كمالك معدات، اضغط على إضافة معدة، وأدخل بيانات المعدة والسعر والموقع. ستظهر للمستأجرين فوراً."),
+        ("متى أستلم المبلغ؟", "يتم تحويل المبلغ إلى حسابك خلال 48 ساعة من إتمام الإيجار بعد خصم عمولة المنصة (5%)."),
+        ("ماذا لو تضررت معدتي؟", "في حالة الأضرار، يتم فتح بلاغ تأمين. نصحح الوضع عبر مبلغ التأمين المحجوز ووثيقة التأمين الشاملة."),
+        ("هل يمكنني رفض طلب إيجار؟", "نعم، لك الحق في قبول أو رفض أي طلب قبل التأكيد. بعد التأكيد، الإلغاء يخضع لسياسة المنصة."),
+        }),
+        };
+        }
+
+        @foreach (var (category, items) in faqs)
+        {
+            <div class="faq-group">
+                <div class="faq-group-title">@category</div>
+                @foreach (var (q, a) in items)
+                {
+                    <div class="faq-item" onclick="toggleFaq(this)">
+                        <div class="faq-question">
+                            <span>@q</span>
+                            <span class="faq-icon">+</span>
+                        </div>
+                        <div class="faq-answer">@a</div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="inner-cta">
+        <h2 class="inner-cta-title">لم تجد إجابتك؟</h2>
+        <p class="inner-cta-desc">تواصل مع فريق الدعم مباشرة</p>
+        <a asp-controller="Home" asp-action="Contact" class="btn-primary">تواصل معنا</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleFaq(el) {
+            const isOpen = el.classList.contains('open');
+            document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+            if (!isOpen) el.classList.add('open');
+        }
+    </script>
 }

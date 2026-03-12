@@ -1,5 +1,94 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "كيف يعمل";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "pages";
 }
+
+<div class="inner-page">
+
+    <!-- HERO -->
+    <div class="inner-hero">
+        <div class="section-label">HOW IT WORKS</div>
+        <div class="gold-divider" style="margin:0.5rem auto"></div>
+        <h1 class="inner-hero-title">كيف تعمل المنصة؟</h1>
+        <p class="inner-hero-desc">عملية بسيطة من 4 خطوات تفصلك عن معدتك المثالية</p>
+    </div>
+
+    <!-- FOR CUSTOMER -->
+    <div class="hiw-section">
+        <div class="hiw-section-label">🚜 إذا كنت مستأجراً</div>
+        <div class="hiw-steps">
+            <div class="hiw-step">
+                <div class="hiw-step-num">01</div>
+                <div class="hiw-step-icon">🔍</div>
+                <h3 class="hiw-step-title">ابحث عن معدتك</h3>
+                <p class="hiw-step-desc">تصفح مئات المعدات المتاحة، فلتر حسب النوع والمدينة وتاريخ الإتاحة</p>
+            </div>
+            <div class="hiw-arrow">←</div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">02</div>
+                <div class="hiw-step-icon">📋</div>
+                <h3 class="hiw-step-title">قدّم طلب الإيجار</h3>
+                <p class="hiw-step-desc">اختر الفترة المناسبة وأرسل الطلب — المالك سيرد خلال 24 ساعة</p>
+            </div>
+            <div class="hiw-arrow">←</div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">03</div>
+                <div class="hiw-step-icon">✅</div>
+                <h3 class="hiw-step-title">تأكيد وفحص</h3>
+                <p class="hiw-step-desc">يتم فحص المعدة قبل التسليم لضمان سلامتها وجاهزيتها للعمل</p>
+            </div>
+            <div class="hiw-arrow">←</div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">04</div>
+                <div class="hiw-step-icon">🚀</div>
+                <h3 class="hiw-step-title">ابدأ مشروعك</h3>
+                <p class="hiw-step-desc">استلم المعدة وابدأ العمل بضمان كامل وتأمين شامل طوال فترة الإيجار</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOR OWNER -->
+    <div class="hiw-section hiw-section-dark">
+        <div class="hiw-section-label">🏗 إذا كنت مالك معدات</div>
+        <div class="hiw-steps">
+            <div class="hiw-step">
+                <div class="hiw-step-num">01</div>
+                <div class="hiw-step-icon">📝</div>
+                <h3 class="hiw-step-title">سجّل معدتك</h3>
+                <p class="hiw-step-desc">أضف بيانات معدتك وحدد السعر والموقع وفترات الإتاحة</p>
+            </div>
+            <div class="hiw-arrow">←</div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">02</div>
+                <div class="hiw-step-icon">🔔</div>
+                <h3 class="hiw-step-title">استقبل الطلبات</h3>
+                <p class="hiw-step-desc">ستصلك إشعارات فور وصول طلبات إيجار جديدة — وافق أو ارفض بضغطة</p>
+            </div>
+            <div class="hiw-arrow">←</div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">03</div>
+                <div class="hiw-step-icon">🔧</div>
+                <h3 class="hiw-step-title">سلّم المعدة</h3>
+                <p class="hiw-step-desc">يتم فحص المعدة وتوثيق حالتها قبل وبعد كل إيجار لحمايتك</p>
+            </div>
+            <div class="hiw-arrow">←</div>
+            <div class="hiw-step">
+                <div class="hiw-step-num">04</div>
+                <div class="hiw-step-icon">💰</div>
+                <h3 class="hiw-step-title">استلم أرباحك</h3>
+                <p class="hiw-step-desc">يتم تحويل المبلغ بعد إتمام الإيجار مباشرة إلى حسابك</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ TEASER -->
+    <div class="inner-cta">
+        <h2 class="inner-cta-title">هل لديك أسئلة؟</h2>
+        <p class="inner-cta-desc">تصفح الأسئلة الشائعة أو تواصل معنا مباشرة</p>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap">
+            <a asp-controller="Home" asp-action="FAQ" class="btn-primary">الأسئلة الشائعة</a>
+            <a asp-controller="Home" asp-action="Contact" class="btn-outline">تواصل معنا</a>
+        </div>
+    </div>
+</div>
