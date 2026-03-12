@@ -1,5 +1,138 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HeavyEquipment.Application.Features.RentalOrders.Commands.Create.CreateRentalOrderCommand
 @{
+    ViewData["Title"] = "طلب إيجار جديد";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "rental";
+}
+
+<div class="rental-page">
+
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">NEW ORDER</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">طلب إيجار جديد</h1>
+            <p class="page-header-desc">حدد فترة الإيجار وأرسل طلبك</p>
+        </div>
+    </div>
+
+    <div class="create-layout" style="padding:2rem 4rem">
+
+        <div class="create-form-wrapper">
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-error">
+                    ❌
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>@error.ErrorMessage</div>
+                    }
+                </div>
+            }
+
+            <form asp-action="Create" asp-controller="RentalOrder" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="EquipmentId" value="@ViewBag.EquipmentId" />
+
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="form-section-num">01</span>
+                        فترة الإيجار
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">تاريخ البدء *</label>
+                            <input asp-for="RentalStart" class="form-control"
+                                   type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                   onchange="calcTotal()" />
+                            <span asp-validation-for="RentalStart" class="form-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">تاريخ الانتهاء *</label>
+                            <input asp-for="RentalEnd" class="form-control"
+                                   type="date" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                                   onchange="calcTotal()" />
+                            <span asp-validation-for="RentalEnd" class="form-error"></span>
+                        </div>
+                    </div>
+
+                    <!-- Live Price Preview -->
+                    <div class="price-preview" id="pricePreview" style="display:none">
+                        <div class="price-preview-row">
+                            <span>المدة المختارة</span>
+                            <span id="previewDays">— يوم</span>
+                        </div>
+                        <div class="price-preview-row">
+                            <span>سعر الساعة</span>
+                            <span>@ViewBag.HourlyRate ج.م</span>
+                        </div>
+                        <div class="price-preview-total">
+                            <span>التكلفة التقريبية</span>
+                            <span id="previewTotal" style="color:var(--gold); font-family:var(--font-en); font-size:1.4rem">0 ج.م</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a asp-controller="Equipment" asp-action="Details"
+                       asp-route-id="@ViewBag.EquipmentId" class="btn-outline">
+                        رجوع
+                    </a>
+                    <button type="submit" class="btn-primary">📋 إرسال الطلب</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TIPS SIDEBAR -->
+        <div class="create-tips">
+            <div class="tips-card">
+                <div class="tips-title">📌 معلومات مهمة</div>
+                <div class="tip-item">
+                    <div class="tip-icon">⏰</div>
+                    <div>
+                        <div class="tip-title">وقت التأكيد</div>
+                        <div class="tip-desc">يتم تأكيد الطلب خلال 24 ساعة من المالك</div>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-icon">🔒</div>
+                    <div>
+                        <div class="tip-title">التأمين</div>
+                        <div class="tip-desc">يُدفع مبلغ التأمين عند التسليم ويُرد بعد الاستلام</div>
+                    </div>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-icon">❌</div>
+                    <div>
+                        <div class="tip-title">سياسة الإلغاء</div>
+                        <div class="tip-desc">إلغاء مجاني قبل 24 ساعة من موعد البدء</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const hourlyRate = @(ViewBag.HourlyRate ?? 0);
+
+        function calcTotal() {
+            const start = document.querySelector('[name="RentalStart"]').value;
+            const end = document.querySelector('[name="RentalEnd"]').value;
+            if (!start || !end) return;
+
+            const days = Math.round((new Date(end) - new Date(start)) / 86400000);
+            if (days <= 0) return;
+
+            const totalHours = days * 8; // 8 ساعات عمل يومياً
+            const total = totalHours * hourlyRate;
+
+            document.getElementById('previewDays').textContent = days + ' يوم (≈ ' + totalHours + ' ساعة)';
+            document.getElementById('previewTotal').textContent = total.toLocaleString() + ' ج.م';
+            document.getElementById('pricePreview').style.display = 'block';
+        }
+    </script>
 }

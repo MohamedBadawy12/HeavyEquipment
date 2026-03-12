@@ -9,6 +9,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
 
+    <style>
+        .nav-link-btn {
+            display: block;
+            width: 100%;
+            padding: 0.7rem 1.2rem;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-family: var(--font-ar);
+            font-size: 0.875rem;
+            text-align: right;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+            .nav-link-btn.danger {
+                color: #c0392b;
+            }
+
+                .nav-link-btn.danger:hover {
+                    background: rgba(192,57,43,0.1);
+                    color: #e74c3c;
+                }
+    </style>
     @if (IsSectionDefined("Styles"))
     {
         @await RenderSectionAsync("Styles", required: false)
@@ -59,7 +83,12 @@
                         }
                         <a asp-controller="Account" asp-action="Profile">👤 الملف الشخصي</a>
                         <a asp-controller="Notification" asp-action="Index">🔔 الإشعارات</a>
-                        <a asp-controller="Account" asp-action="Logout" class="danger">🚪 تسجيل الخروج</a>
+                        <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0; padding:0">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="nav-link-btn danger">
+                                🚪 تسجيل الخروج
+                            </button>
+                        </form>
                     </div>
                 </li>
             }

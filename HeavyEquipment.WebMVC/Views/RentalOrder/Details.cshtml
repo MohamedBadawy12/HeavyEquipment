@@ -1,5 +1,201 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HeavyEquipment.Application.Features.RentalOrders.Dtos.RentalOrderDto
 @{
+    ViewData["Title"] = "تفاصيل الطلب";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "rental";
 }
+
+@{
+    var (statusClass, statusLabel, statusIcon) = Model.Status switch
+    {
+        "Pending" => ("status-pending", "في الانتظار", "⏳"),
+        "Confirmed" => ("status-confirmed", "مؤكد", "✅"),
+        "Active" => ("status-active", "نشط", "🟢"),
+        "Completed" => ("status-completed", "مكتمل", "🏁"),
+        "Cancelled" => ("status-cancelled", "ملغي", "❌"),
+        "Disputed" => ("status-disputed", "متنازع عليه", "⚠️"),
+        _ => ("status-pending", Model.Status, "❓")
+    };
+}
+
+<div class="rental-page">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb-bar">
+        <a asp-controller="Home" asp-action="Index">الرئيسية</a>
+        <span>←</span>
+        <a asp-controller="RentalOrder" asp-action="MyOrders">طلباتي</a>
+        <span>←</span>
+        <span class="breadcrumb-current">#@Model.Id.ToString()[..8].ToUpper()</span>
+    </div>
+
+    <div class="details-layout" style="padding:2rem 4rem">
+
+        <!-- MAIN COLUMN -->
+        <div class="details-main">
+
+            <!-- Order Header Card -->
+            <div class="order-header-card">
+                <div class="order-header-top">
+                    <div>
+                        <div class="order-ref">طلب رقم #@Model.Id.ToString()[..8].ToUpper()</div>
+                        <div class="order-equip-title">@Model.EquipmentName</div>
+                    </div>
+                    <span class="order-status @statusClass" style="font-size:1rem; padding:0.6rem 1.2rem">
+                        @statusIcon @statusLabel
+                    </span>
+                </div>
+
+                <!-- Timeline -->
+                <div class="order-timeline">
+                    @{
+                        var steps = new[] { "Pending", "Confirmed", "Active", "Completed" };
+                        var currentIdx = Array.IndexOf(steps, Model.Status);
+                        if (Model.Status == "Cancelled" || Model.Status == "Disputed") currentIdx = -1;
+                    }
+                    @for (int i = 0; i < steps.Length; i++)
+                    {
+                        var stepLabel = steps[i] switch
+                        {
+                            "Pending" => "في الانتظار",
+                            "Confirmed" => "مؤكد",
+                            "Active" => "نشط",
+                            "Completed" => "مكتمل",
+                            _ => steps[i]
+                        };
+                        <div class="timeline-step @(i <= currentIdx ? "done" : "") @(i == currentIdx ? "current" : "")">
+                            <div class="timeline-dot">@(i < currentIdx ? "✓" : (i + 1).ToString())</div>
+                            <div class="timeline-label">@stepLabel</div>
+                            @if (i < steps.Length - 1)
+                            {
+                                <div class="timeline-line @(i < currentIdx ? "done" : "")"></div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Rental Details -->
+            <div class="details-info-card">
+                <div class="details-section-title">📋 تفاصيل الإيجار</div>
+                <div class="rental-details-grid">
+                    <div class="rental-detail-item">
+                        <div class="rental-detail-label">تاريخ البدء</div>
+                        <div class="rental-detail-value">@Model.RentalStart.ToString("dd MMMM yyyy")</div>
+                    </div>
+                    <div class="rental-detail-item">
+                        <div class="rental-detail-label">تاريخ الانتهاء</div>
+                        <div class="rental-detail-value">@Model.RentalEnd.ToString("dd MMMM yyyy")</div>
+                    </div>
+                    <div class="rental-detail-item">
+                        <div class="rental-detail-label">مدة الإيجار</div>
+                        <div class="rental-detail-value">@((Model.RentalEnd - Model.RentalStart).Days) يوم</div>
+                    </div>
+                    <div class="rental-detail-item">
+                        <div class="rental-detail-label">سعر الساعة</div>
+                        <div class="rental-detail-value">@Model.HourlyRate.ToString("N0") ج.م</div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.CancellationReason))
+                {
+                    <div class="alert alert-error" style="margin-top:1rem">
+                        ❌ سبب الإلغاء: @Model.CancellationReason
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.DisputeReason))
+                {
+                    <div class="alert alert-warning" style="margin-top:1rem">
+                        ⚠️ سبب النزاع: @Model.DisputeReason
+                    </div>
+                }
+            </div>
+
+            <!-- Owner Actions (لو المستخدم مالك) -->
+            @if (User.IsInRole("Owner"))
+            {
+                <div class="details-info-card">
+                    <div class="details-section-title">⚙️ إجراءات المالك</div>
+                    <div class="owner-actions-grid">
+
+                        @if (Model.Status == "Pending")
+                        {
+                            <form asp-action="Confirm" asp-controller="RentalOrder" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn-primary btn-full">✅ تأكيد الطلب</button>
+                            </form>
+                        }
+
+                        @if (Model.Status == "Confirmed")
+                        {
+                            <form asp-action="MarkAsActive" asp-controller="RentalOrder" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn-primary btn-full">🚀 بدء التأجير</button>
+                            </form>
+                        }
+
+                        @if (Model.Status == "Active")
+                        {
+                            <a asp-action="Complete" asp-controller="RentalOrder"
+                               asp-route-id="@Model.Id" class="btn-primary btn-full" style="text-align:center;display:block">
+                                🏁 إتمام الطلب
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="details-sidebar">
+
+            <!-- Price Summary -->
+            <div class="booking-card">
+                <div class="booking-card-header">
+                    <div class="booking-price-label">إجمالي التكلفة</div>
+                    <div class="booking-price">
+                        <span class="booking-price-value">@Model.TotalPrice.ToString("N0")</span>
+                        <span class="booking-price-currency">ج.م</span>
+                    </div>
+                </div>
+                <div style="padding:1.2rem 1.5rem; display:flex; flex-direction:column; gap:0.7rem">
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                        <span style="color:var(--muted)">سعر الساعة</span>
+                        <span>@Model.HourlyRate.ToString("N0") ج.م</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                        <span style="color:var(--muted)">المدة</span>
+                        <span>@((Model.RentalEnd - Model.RentalStart).Days) يوم</span>
+                    </div>
+                    <div style="border-top:1px solid var(--border); padding-top:0.7rem; display:flex; justify-content:space-between; font-weight:700">
+                        <span>الإجمالي</span>
+                        <span style="color:var(--gold)">@Model.TotalPrice.ToString("N0") ج.م</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cancel Button (للعميل) -->
+            @if (!User.IsInRole("Owner") && (Model.Status == "Pending" || Model.Status == "Confirmed"))
+            {
+                <a asp-action="Cancel" asp-controller="RentalOrder"
+                   asp-route-id="@Model.Id"
+                   class="btn-danger btn-full" style="text-align:center; display:block">
+                    ❌ إلغاء الطلب
+                </a>
+            }
+
+            <!-- Equipment Quick Info -->
+            <div class="location-card">
+                <div class="details-section-title">🏗 المعدة</div>
+                <a asp-controller="Equipment" asp-action="Details"
+                   asp-route-id="@Model.EquipmentId"
+                   style="color:var(--gold); text-decoration:none; font-weight:700; font-size:0.9rem">
+                    @Model.EquipmentName ←
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,48 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "إتمام الطلب";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "rental";
 }
+
+<div class="rental-page">
+    <div style="max-width:520px; margin:4rem auto; padding:0 2rem">
+
+        <div class="create-form-wrapper">
+            <div style="text-align:center; margin-bottom:2rem">
+                <div style="font-size:3rem; margin-bottom:1rem">🏁</div>
+                <h1 style="font-size:1.5rem; font-weight:700; margin-bottom:0.5rem">إتمام الطلب</h1>
+                <p style="color:var(--muted); font-size:0.9rem">
+                    أدخل عدد ساعات التشغيل الفعلية لإتمام الطلب وتحديث سجل المعدة
+                </p>
+            </div>
+
+            <form asp-action="Complete" asp-controller="RentalOrder" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@ViewBag.OrderId" />
+
+                <div class="form-group">
+                    <label class="form-label">ساعات التشغيل الفعلية *</label>
+                    <div class="input-with-suffix">
+                        <input type="number" name="hoursOperated"
+                               class="form-control"
+                               min="1" placeholder="48" required />
+                        <span class="input-suffix">ساعة</span>
+                    </div>
+                    <small style="color:var(--muted); font-size:0.78rem; margin-top:0.4rem; display:block">
+                        سيتم تحديث عداد ساعات المعدة بهذا الرقم
+                    </small>
+                </div>
+
+                <div class="form-actions">
+                    <a asp-controller="RentalOrder"
+                       asp-action="Details"
+                       asp-route-id="@ViewBag.OrderId"
+                       class="btn-outline">
+                        رجوع
+                    </a>
+                    <button type="submit" class="btn-primary">🏁 تأكيد الإتمام</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,139 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HeavyEquipment.Application.Common.Models.Result<System.Collections.Generic.IReadOnlyList<HeavyEquipment.Application.Features.RentalOrders.Dtos.RentalOrderSummaryDto>>
 @{
+    ViewData["Title"] = "طلباتي";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "rental";
 }
+
+<div class="rental-page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">MY ORDERS</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">طلباتي</h1>
+            <p class="page-header-desc">تتبع جميع طلبات الإيجار الخاصة بك</p>
+        </div>
+        <a asp-controller="Equipment" asp-action="Index" class="btn-outline">
+            🔍 تصفح المعدات
+        </a>
+    </div>
+
+    <!-- STATS BAR -->
+    @if (Model.IsSuccess && Model.Value!.Any())
+    {
+        var orders = Model.Value!;
+        <div class="orders-stats">
+            <div class="orders-stat">
+                <div class="orders-stat-value">@orders.Count</div>
+                <div class="orders-stat-label">إجمالي الطلبات</div>
+            </div>
+            <div class="orders-stat">
+                <div class="orders-stat-value" style="color:#4CAF50">
+                    @orders.Count(o => o.Status == "Active")
+                </div>
+                <div class="orders-stat-label">نشطة الآن</div>
+            </div>
+            <div class="orders-stat">
+                <div class="orders-stat-value" style="color:var(--gold)">
+                    @orders.Count(o => o.Status == "Confirmed")
+                </div>
+                <div class="orders-stat-label">مؤكدة</div>
+            </div>
+            <div class="orders-stat">
+                <div class="orders-stat-value" style="color:var(--muted)">
+                    @orders.Count(o => o.Status == "Completed")
+                </div>
+                <div class="orders-stat-label">مكتملة</div>
+            </div>
+        </div>
+    }
+
+    <!-- ORDERS LIST -->
+    <div class="orders-container">
+        @if (!Model.IsSuccess || !Model.Value!.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <div class="empty-title">لا توجد طلبات بعد</div>
+                <div class="empty-desc">ابحث عن معدة وقدّم طلب إيجارك الأول</div>
+                <a asp-controller="Equipment" asp-action="Index" class="btn-primary" style="margin-top:1.5rem">
+                    تصفح المعدات
+                </a>
+            </div>
+        }
+        else
+        {
+            @foreach (var order in Model.Value!)
+            {
+                var (statusClass, statusLabel, statusIcon) = order.Status switch
+                {
+                    "Pending" => ("status-pending", "في الانتظار", "⏳"),
+                    "Confirmed" => ("status-confirmed", "مؤكد", "✅"),
+                    "Active" => ("status-active", "نشط", "🟢"),
+                    "Completed" => ("status-completed", "مكتمل", "🏁"),
+                    "Cancelled" => ("status-cancelled", "ملغي", "❌"),
+                    "Disputed" => ("status-disputed", "متنازع عليه", "⚠️"),
+                    _ => ("status-pending", order.Status, "❓")
+                };
+                <div class="order-card">
+                    <div class="order-card-header">
+                        <div class="order-equip-info">
+                            <div class="order-equip-icon">🏗</div>
+                            <div>
+                                <div class="order-equip-name">@order.EquipmentName</div>
+                                <div class="order-id">#@order.Id.ToString()[..8].ToUpper()</div>
+                            </div>
+                        </div>
+                        <span class="order-status @statusClass">
+                            @statusIcon @statusLabel
+                        </span>
+                    </div>
+
+                    <div class="order-card-body">
+                        <div class="order-detail">
+                            <div class="order-detail-label">تاريخ البدء</div>
+                            <div class="order-detail-value">@order.RentalStart.ToString("dd MMM yyyy")</div>
+                        </div>
+                        <div class="order-detail">
+                            <div class="order-detail-label">تاريخ الانتهاء</div>
+                            <div class="order-detail-value">@order.RentalEnd.ToString("dd MMM yyyy")</div>
+                        </div>
+                        <div class="order-detail">
+                            <div class="order-detail-label">المدة</div>
+                            <div class="order-detail-value">
+                                @((order.RentalEnd - order.RentalStart).Days) يوم
+                            </div>
+                        </div>
+                        <div class="order-detail">
+                            <div class="order-detail-label">إجمالي التكلفة</div>
+                            <div class="order-detail-value order-price">
+                                @order.TotalPrice.ToString("N0") ج.م
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-card-footer">
+                        <a asp-controller="RentalOrder"
+                           asp-action="Details"
+                           asp-route-id="@order.Id"
+                           class="btn-outline btn-sm">
+                            عرض التفاصيل
+                        </a>
+
+                        @if (order.Status == "Pending" || order.Status == "Confirmed")
+                        {
+                            <a asp-controller="RentalOrder"
+                               asp-action="Cancel"
+                               asp-route-id="@order.Id"
+                               class="btn-danger btn-sm">
+                                إلغاء الطلب
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
