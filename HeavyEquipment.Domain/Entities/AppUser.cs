@@ -42,6 +42,17 @@ namespace HeavyEquipment.Domain.Entities
             Role = role;
         }
 
+        public void UpdateProfile(string fullName, string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(fullName))
+                throw new DomainException("الاسم مطلوب");
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                throw new DomainException("رقم الهاتف مطلوب");
+
+            FullName = fullName;
+            PhoneNumber = phoneNumber;
+            UpdatedAt = DateTime.UtcNow;
+        }
         public void Verify()
         {
             if (IsVerified) throw new DomainException("المستخدم تم التحقق منه مسبقاً");

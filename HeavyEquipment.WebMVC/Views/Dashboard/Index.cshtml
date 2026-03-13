@@ -1,0 +1,202 @@
+﻿@model HeavyEquipment.WebMVC.ViewModels.Dashboard.DashboardViewModel
+@{
+    ViewData["Title"] = "لوحة التحكم";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "dashboard";
+}
+
+<div class="inner-page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">OWNER DASHBOARD</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">لوحة التحكم</h1>
+            <p class="page-header-desc">مرحباً! هنا ملخص كامل لأداء معداتك وإيراداتك.</p>
+        </div>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap">
+            <a asp-controller="Equipment" asp-action="Create" class="btn-primary">
+                ➕ إضافة معدة
+            </a>
+            <a asp-controller="Equipment" asp-action="MyEquipments" class="btn-outline">
+                🏗 إدارة المعدات
+            </a>
+        </div>
+    </div>
+
+    <div class="dashboard-body">
+
+        <!-- ===== ROW 1: STATS ===== -->
+        <div class="stats-grid">
+
+            <!-- إجمالي الإيرادات -->
+            <div class="stat-card stat-gold">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalRevenue.ToString("N0") <span>ج.م</span></div>
+                    <div class="stat-label">إجمالي الإيرادات</div>
+                </div>
+                <div class="stat-sub">
+                    هذا الشهر: @Model.MonthRevenue.ToString("N0") ج.م
+                </div>
+            </div>
+
+            <!-- المعدات -->
+            <div class="stat-card">
+                <div class="stat-icon">🏗</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalEquipments</div>
+                    <div class="stat-label">إجمالي المعدات</div>
+                </div>
+                <div class="stat-sub">
+                    <span class="dot-green"></span> @Model.AvailableEquipments متاحة &nbsp;
+                    <span class="dot-gold"></span> @Model.RentedEquipments مؤجرة &nbsp;
+                    <span class="dot-red"></span> @Model.UnderMaintenance صيانة
+                </div>
+            </div>
+
+            <!-- الطلبات النشطة -->
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.ActiveRentals</div>
+                    <div class="stat-label">طلبات نشطة</div>
+                </div>
+                <div class="stat-sub">
+                    @Model.PendingRentals في الانتظار · @Model.CompletedRentals مكتملة
+                </div>
+            </div>
+
+            <!-- معدل الإشغال -->
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    @{
+                        var occupancy = Model.TotalEquipments > 0
+                        ? (double)Model.RentedEquipments / Model.TotalEquipments * 100
+                        : 0;
+                    }
+                    <div class="stat-value">@occupancy.ToString("F0")<span>%</span></div>
+                    <div class="stat-label">معدل الإشغال</div>
+                </div>
+                <div class="stat-progress">
+                    <div class="stat-progress-fill" style="width:@occupancy%"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== ROW 2: RECENT ORDERS + EQUIPMENTS ===== -->
+        <div class="dashboard-grid">
+
+            <!-- الطلبات الأخيرة -->
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <div class="dashboard-card-title">📋 الطلبات النشطة</div>
+                    <a asp-controller="RentalOrder" asp-action="MyOrders" class="dashboard-card-link">
+                        عرض الكل ←
+                    </a>
+                </div>
+
+                @if (!Model.RecentOrders.Any())
+                {
+                    <div class="empty-state" style="padding:3rem 1rem">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-title">لا توجد طلبات نشطة</div>
+                        <div class="empty-desc">ستظهر الطلبات هنا عند وجودها</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="orders-list">
+                        @foreach (var order in Model.RecentOrders)
+                        {
+                            <div class="order-row">
+                                <div class="order-row-info">
+                                    <div class="order-row-name">@order.EquipmentName</div>
+                                    <div class="order-row-dates">
+                                        @order.RentalStart.ToString("dd MMM") — @order.RentalEnd.ToString("dd MMM yyyy")
+                                    </div>
+                                </div>
+                                <div class="order-row-right">
+                                    <div class="order-row-price">@order.TotalPrice.ToString("N0") ج.م</div>
+                                    <span class="status-badge status-@order.Status.ToLower()">
+                                        @(order.Status switch
+                                        {
+                                            "Active" => "نشط",
+                                            "Confirmed" => "مؤكد",
+                                            "Pending" => "انتظار",
+                                            "Completed" => "مكتمل",
+                                            _ => order.Status
+                                        })
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- معداتي -->
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <div class="dashboard-card-title">🏗 معداتي</div>
+                    <a asp-controller="Equipment" asp-action="MyEquipments" class="dashboard-card-link">
+                        إدارة الكل ←
+                    </a>
+                </div>
+
+                @if (!Model.Equipments.Any())
+                {
+                    <div class="empty-state" style="padding:3rem 1rem">
+                        <div class="empty-icon">🏚</div>
+                        <div class="empty-title">لا توجد معدات مسجلة</div>
+                        <a asp-controller="Equipment" asp-action="Create" class="btn-primary btn-sm" style="margin-top:1rem">
+                            ➕ أضف معدتك الأولى
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="equipment-list">
+                        @foreach (var eq in Model.Equipments.Take(6))
+                        {
+                            <div class="eq-row">
+                                <div class="eq-row-icon">
+                                    @(eq.Category switch
+                                    {
+                                        "Crane" => "🏗",
+                                        "Excavator" => "⛏",
+                                        "Generator" => "⚡",
+                                        "Bulldozer" => "🚜",
+                                        "Loader" => "🚛",
+                                        _ => "⚙"
+                                    })
+                                </div>
+                                <div class="eq-row-info">
+                                    <div class="eq-row-name">@eq.Name</div>
+                                    <div class="eq-row-city">📍 @eq.City</div>
+                                </div>
+                                <div class="eq-row-right">
+                                    <div class="eq-row-rate">@eq.HourlyRate.ToString("N0") ج.م/س</div>
+                                    <span class="status-badge status-@eq.Status.ToLower()">
+                                        @(eq.Status switch
+                                        {
+                                            "Available" => "متاح",
+                                            "Rented" => "مؤجر",
+                                            "UnderMaintenance" => "صيانة",
+                                            _ => eq.Status
+                                        })
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+        </div>
+
+    </div>
+</div>
