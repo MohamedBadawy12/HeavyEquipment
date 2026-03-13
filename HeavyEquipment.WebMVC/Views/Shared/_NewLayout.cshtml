@@ -32,6 +32,29 @@
                     background: rgba(192,57,43,0.1);
                     color: #e74c3c;
                 }
+
+        .nav-links.mobile-open {
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: rgba(10,10,10,0.98);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            gap: 1rem;
+            z-index: 99;
+        }
+
+            .nav-links.mobile-open li {
+                width: 100%;
+            }
+
+            .nav-links.mobile-open a {
+                font-size: 1rem;
+                padding: 0.5rem 0;
+            }
     </style>
     @if (IsSectionDefined("Styles"))
     {
@@ -72,7 +95,7 @@
                         ▾
                     </button>
                     <div class="nav-dropdown">
-                        @if (User.IsInRole("Owner"))
+                        @if (User.IsInRole("Owner")||User.IsInRole("Admin"))
                         {
                             <a asp-controller="Dashboard" asp-action="Index">📊 لوحة التحكم</a>
                             <a asp-controller="Equipment" asp-action="MyEquipments">🏗 معداتي</a>
@@ -189,5 +212,14 @@
     {
          @await RenderSectionAsync("Scripts", required: false)
     }
+    <script>
+        window.toggleMobileMenu = function () {
+            var navLinks = document.querySelector('.nav-links');
+            if (!navLinks) return;
+            var isOpen = navLinks.classList.toggle('mobile-open');
+            var btn = document.querySelector('.nav-mobile-btn');
+            if (btn) btn.textContent = isOpen ? '✕' : '☰';
+        };
+    </script>
 </body>
 </html>

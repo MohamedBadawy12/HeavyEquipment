@@ -1,6 +1,8 @@
 ﻿using HeavyEquipment.Domain.Entities;
 using HeavyEquipment.Domain.Enums;
+using HeavyEquipment.Domain.Exceptions;
 using HeavyEquipment.WebMVC.ViewModels.Account;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -109,6 +111,28 @@ namespace HeavyEquipment.WebMVC.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user is null) return RedirectToAction(nameof(Login));
             return View(user);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(string fullName, string phoneNumber)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user is null) return RedirectToAction(nameof(Login));
+
+            try
+            {
+                user.UpdateProfile(fullName, phoneNumber);
+                await _userManager.UpdateAsync(user);
+                TempData["ProfileSuccess"] = "تم تحديث بياناتك بنجاح";
+            }
+            catch (DomainException ex)
+            {
+                TempData["ProfileError"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Profile));
         }
     }
 }

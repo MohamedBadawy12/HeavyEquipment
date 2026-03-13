@@ -2,6 +2,7 @@
 {
     public record RentalOrderSummaryDto(
          Guid Id,
+         Guid EquipmentId,
          string EquipmentName,
          DateTime RentalStart,
          DateTime RentalEnd,

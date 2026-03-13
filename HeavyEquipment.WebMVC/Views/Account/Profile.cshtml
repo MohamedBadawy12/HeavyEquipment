@@ -1,5 +1,193 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model HeavyEquipment.Domain.Entities.AppUser
 @{
+    ViewData["Title"] = "الملف الشخصي";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "pages";
 }
+
+<div class="inner-page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">MY PROFILE</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">الملف الشخصي</h1>
+        </div>
+    </div>
+
+    <div class="profile-layout">
+
+        <!-- ===== LEFT — Info Card ===== -->
+        <div class="profile-sidebar">
+
+            <!-- Avatar -->
+            <div class="profile-avatar-card">
+                <div class="profile-avatar">
+                    @Model.FullName[0].ToString().ToUpper()
+                </div>
+                <div class="profile-name">@Model.FullName</div>
+                <div class="profile-email">@Model.Email</div>
+
+                <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; margin-top:1rem">
+                    <span class="badge badge-gold">
+                        @(Model.Role.ToString() switch
+                        {
+                            "Owner" => "🏗 مالك معدات",
+                            "Customer" => "🚜 مستأجر",
+                            "Admin" => "⚙ مدير",
+                            _ => Model.Role.ToString()
+                        })
+                    </span>
+                    @if (Model.IsVerified)
+                    {
+                        <span class="badge badge-green">✅ موثق</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-muted">⏳ غير موثق</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Trust Score -->
+            <div class="profile-trust-card">
+                <div class="profile-trust-label">Trust Score</div>
+                <div class="profile-trust-value">@Model.TrustScore<span>/100</span></div>
+                <div class="profile-trust-bar">
+                    <div class="profile-trust-fill" style="width:@Model.TrustScore%"></div>
+                </div>
+                <div class="profile-trust-desc">
+                    @(Model.TrustScore switch
+                    {
+                        >= 90 => "⭐ ممتاز — مستخدم موثوق جداً",
+                        >= 75 => "👍 جيد جداً",
+                        >= 60 => "🆗 جيد",
+                        _ => "⚠️ يحتاج تحسين"
+                    })
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="profile-stats-card">
+                <div class="profile-stat">
+                    <div class="profile-stat-value">@Model.CreatedAt.ToString("MMM yyyy")</div>
+                    <div class="profile-stat-label">تاريخ الانضمام</div>
+                </div>
+                @if (Model.Role == HeavyEquipment.Domain.Enums.UserType.Owner)
+                {
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">@Model.OwnedEquipments.Count</div>
+                        <div class="profile-stat-label">معدة مسجلة</div>
+                    </div>
+                }
+                else
+                {
+                    <div class="profile-stat">
+                        <div class="profile-stat-value">@Model.MyRentals.Count</div>
+                        <div class="profile-stat-label">طلب إيجار</div>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+        <!-- ===== RIGHT — Edit Form ===== -->
+        <div class="profile-main">
+
+            @if (TempData["ProfileSuccess"] != null)
+            {
+                <div class="alert alert-success">✅ @TempData["ProfileSuccess"]</div>
+            }
+            @if (TempData["ProfileError"] != null)
+            {
+                <div class="alert alert-error">❌ @TempData["ProfileError"]</div>
+            }
+
+            <!-- Edit Info -->
+            <div class="profile-section-card">
+                <div class="profile-section-title">
+                    <span class="form-section-num">01</span>
+                    تعديل البيانات الشخصية
+                </div>
+
+                <form asp-action="UpdateProfile" asp-controller="Account" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">الاسم الكامل</label>
+                            <input type="text" name="fullName" class="form-control"
+                                   value="@Model.FullName" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رقم الهاتف</label>
+                            <input type="text" name="phoneNumber" class="form-control"
+                                   value="@Model.PhoneNumber" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">البريد الإلكتروني</label>
+                        <input type="email" class="form-control"
+                               value="@Model.Email" disabled
+                               style="opacity:0.5; cursor:not-allowed" />
+                        <small style="color:var(--muted); font-size:0.78rem; margin-top:0.3rem; display:block">
+                            لا يمكن تغيير البريد الإلكتروني
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">رقم الهوية القومية</label>
+                        <input type="text" class="form-control"
+                               value="@Model.NationalId" disabled
+                               style="opacity:0.5; cursor:not-allowed" />
+                        <small style="color:var(--muted); font-size:0.78rem; margin-top:0.3rem; display:block">
+                            لا يمكن تغيير رقم الهوية — تواصل مع الدعم إذا كان هناك خطأ
+                        </small>
+                    </div>
+
+                    <div class="form-actions" style="border-top:1px solid var(--border); padding-top:1.5rem; margin-top:0.5rem">
+                        <button type="submit" class="btn-primary">💾 حفظ التعديلات</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Change Password -->
+            <div class="profile-section-card">
+                <div class="profile-section-title">
+                    <span class="form-section-num">02</span>
+                    تغيير كلمة المرور
+                </div>
+
+                <form asp-action="ChangePassword" asp-controller="Account" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group">
+                        <label class="form-label">كلمة المرور الحالية</label>
+                        <input type="password" name="currentPassword" class="form-control"
+                               placeholder="••••••••" required />
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">كلمة المرور الجديدة</label>
+                            <input type="password" name="newPassword" class="form-control"
+                                   placeholder="••••••••" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">تأكيد كلمة المرور</label>
+                            <input type="password" name="confirmPassword" class="form-control"
+                                   placeholder="••••••••" required />
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="border-top:1px solid var(--border); padding-top:1.5rem; margin-top:0.5rem">
+                        <button type="submit" class="btn-outline">🔒 تغيير كلمة المرور</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

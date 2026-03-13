@@ -21,6 +21,7 @@ namespace HeavyEquipment.Application.Features.RentalOrders.Commands.Queries
 
             return orders.Select(o => new RentalOrderSummaryDto(
                 o.Id,
+                o.EquipmentId,
                 o.Equipment?.Name ?? "",
                 o.RentalStart,
                 o.RentalEnd,
