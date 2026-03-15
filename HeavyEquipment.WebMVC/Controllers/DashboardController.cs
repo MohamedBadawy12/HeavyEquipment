@@ -21,7 +21,8 @@ namespace HeavyEquipment.WebMVC.Controllers
         public async Task<IActionResult> Index()
         {
             var equipments = (await _mediator.Send(new GetEquipmentsByOwnerQuery(CurrentUserId)))?.ToList() ?? new();
-            var allOrders = (await _mediator.Send(new GetCustomerOrdersQuery(CurrentUserId)))?.ToList() ?? new();
+            var allOrdersResult = await _mediator.Send(new GetCustomerOrdersQuery(CurrentUserId));
+            var allOrders = allOrdersResult?.Value?.ToList() ?? new();
             var activeOrders = (await _mediator.Send(new GetActiveOrdersQuery()))?.ToList() ?? new();
 
             var ownerEquipmentIds = equipments.Select(e => e.Id).ToHashSet();
