@@ -1,0 +1,151 @@
+﻿@model HeavyEquipment.Application.Features.Users.Dtos.AdminOrdersDto
+@{
+    ViewData["Title"] = "إدارة الطلبات";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "admin";
+}
+
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">ADMIN — ORDERS</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">إدارة الطلبات</h1>
+        </div>
+        <a asp-action="Index" class="btn-outline btn-sm">← لوحة الإدارة</a>
+    </div>
+
+    <div class="dashboard-body">
+
+        <!-- Stats -->
+        <div class="stats-grid stats-grid-5">
+            <div class="stat-card stat-gold">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalRevenue.ToString("N0") <span>ج.م</span></div>
+                    <div class="stat-label">إجمالي الإيرادات</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalOrders</div>
+                    <div class="stat-label">إجمالي الطلبات</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🟢</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.ActiveOrders</div>
+                    <div class="stat-label">نشطة</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.PendingOrders</div>
+                    <div class="stat-label">في الانتظار</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏁</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.CompletedOrders</div>
+                    <div class="stat-label">مكتملة</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="admin-filters">
+            <form method="get" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center">
+                <select name="status" class="form-control" style="max-width:180px">
+                    <option value="">كل الحالات</option>
+                    <option value="Pending" selected="@(Model.StatusFilter == "Pending")">⏳ في الانتظار</option>
+                    <option value="Confirmed" selected="@(Model.StatusFilter == "Confirmed")">✅ مؤكد</option>
+                    <option value="Active" selected="@(Model.StatusFilter == "Active")">🟢 نشط</option>
+                    <option value="Completed" selected="@(Model.StatusFilter == "Completed")">🏁 مكتمل</option>
+                    <option value="Cancelled" selected="@(Model.StatusFilter == "Cancelled")">❌ ملغي</option>
+                </select>
+                <button type="submit" class="btn-primary btn-sm">فلتر</button>
+                @if (!string.IsNullOrEmpty(Model.StatusFilter))
+                {
+                    <a asp-action="Orders" class="btn-outline btn-sm">✕ مسح</a>
+                }
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="dashboard-card" style="padding:0">
+            @if (!Model.Orders.Any())
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">📭</div>
+                    <div class="empty-title">لا توجد طلبات</div>
+                    <div class="empty-desc">جرب تغيير معايير الفلتر</div>
+                </div>
+            }
+            else
+            {
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>المعدة</th>
+                                <th>تاريخ البدء</th>
+                                <th>تاريخ الانتهاء</th>
+                                <th>المدة</th>
+                                <th>الإجمالي</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var o in Model.Orders)
+                            {
+                                var duration = (int)(o.RentalEnd - o.RentalStart).TotalDays;
+                                <tr>
+                                    <td>
+                                        <div class="admin-user-name">@o.EquipmentName</div>
+                                    </td>
+                                    <td style="color:var(--muted); font-size:0.85rem">
+                                        @o.RentalStart.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td style="color:var(--muted); font-size:0.85rem">
+                                        @o.RentalEnd.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td style="color:var(--muted); font-size:0.85rem">
+                                        @duration يوم
+                                    </td>
+                                    <td style="color:var(--gold); font-weight:700">
+                                        @o.TotalPrice.ToString("N0") ج.م
+                                    </td>
+                                    <td>
+                                        <span class="status-badge status-@o.Status.ToLower()">
+                                            @(o.Status switch
+                                            {
+                                                "Pending"   => "⏳ انتظار",
+                                                "Confirmed" => "✅ مؤكد",
+                                                "Active"    => "🟢 نشط",
+                                                "Completed" => "🏁 مكتمل",
+                                                "Cancelled" => "❌ ملغي",
+                                                _           => o.Status
+                                            })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="RentalOrder" asp-action="Details"
+                                           asp-route-id="@o.Id"
+                                           class="admin-btn admin-btn-verify">
+                                            👁 عرض
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

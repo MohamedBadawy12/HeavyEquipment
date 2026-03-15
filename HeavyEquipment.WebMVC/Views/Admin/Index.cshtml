@@ -1,0 +1,182 @@
+﻿@model HeavyEquipment.Application.Features.Users.Dtos.AdminDashboardDto
+@{
+    ViewData["Title"] = "لوحة الإدارة";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "admin";
+}
+
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">ADMIN PANEL</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">لوحة الإدارة</h1>
+            <p class="page-header-desc">إحصائيات وإدارة كاملة للمنصة</p>
+        </div>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap">
+            <a asp-action="Users" class="btn-outline btn-sm">👥 المستخدمين</a>
+            <a asp-action="Equipments" class="btn-outline btn-sm">🏗 المعدات</a>
+            <a asp-action="Orders" class="btn-outline btn-sm">📋 الطلبات</a>
+        </div>
+    </div>
+
+    <div class="dashboard-body">
+
+        <div class="admin-section-label">👥 المستخدمون</div>
+        <div class="stats-grid stats-grid-5">
+            <div class="stat-card stat-gold">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalUsers</div>
+                    <div class="stat-label">إجمالي المستخدمين</div>
+                </div>
+                <div class="stat-sub">
+                    <span class="dot-green"></span> @Model.TotalOwners مالك &nbsp;
+                    <span class="dot-gold"></span> @Model.TotalCustomers مستأجر
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.VerifiedUsers</div>
+                    <div class="stat-label">موثقون</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🚫</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.BlockedUsers</div>
+                    <div class="stat-label">محظورون</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏗</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalEquipments</div>
+                    <div class="stat-label">إجمالي المعدات</div>
+                </div>
+                <div class="stat-sub">
+                    <span class="dot-green"></span> @Model.AvailableEquipments متاحة &nbsp;
+                    <span class="dot-gold"></span> @Model.RentedEquipments مؤجرة
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalRevenue.ToString("N0") <span>ج.م</span></div>
+                    <div class="stat-label">إجمالي الإيرادات</div>
+                </div>
+                <div class="stat-sub">هذا الشهر: @Model.MonthRevenue.ToString("N0") ج.م</div>
+            </div>
+        </div>
+
+        <div class="admin-section-label">📋 الطلبات</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📋</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalOrders</div>
+                    <div class="stat-label">إجمالي الطلبات</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🟢</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.ActiveOrders</div>
+                    <div class="stat-label">نشطة</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.PendingOrders</div>
+                    <div class="stat-label">في الانتظار</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏁</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.CompletedOrders</div>
+                    <div class="stat-label">مكتملة</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Recent Users -->
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <div class="dashboard-card-title">👥 أحدث المستخدمين</div>
+                    <a asp-action="Users" class="dashboard-card-link">عرض الكل ←</a>
+                </div>
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr><th>المستخدم</th><th>الدور</th><th>الحالة</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var u in Model.RecentUsers)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="admin-user-cell">
+                                            <div class="admin-avatar">@(u.FullName.Length > 0 ? u.FullName[0].ToString() : "?")</div>
+                                            <div>
+                                                <div class="admin-user-name">@u.FullName</div>
+                                                <div class="admin-user-email">@u.Email</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="role-badge role-@u.Role.ToLower()">
+                                            @(u.Role switch { "Owner" => "🏗 مالك", "Customer" => "🚜 مستأجر", "Admin" => "⚙ مدير", _ => u.Role })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if (u.IsBlocked)
+                                        {
+                                            <span class="status-badge status-cancelled">🚫 محظور</span>
+                                        }
+                                        else if (u.IsVerified)
+                                        {
+                                            <span class="status-badge status-active">✅ موثق</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge status-pending">⏳ غير موثق</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <div class="dashboard-card-title">📋 أحدث الطلبات</div>
+                    <a asp-action="Orders" class="dashboard-card-link">عرض الكل ←</a>
+                </div>
+                <div class="orders-list">
+                    @foreach (var o in Model.RecentOrders)
+                    {
+                        <div class="order-row">
+                            <div class="order-row-info">
+                                <div class="order-row-name">@o.EquipmentName</div>
+                                <div class="order-row-dates">@o.RentalStart.ToString("dd MMM") — @o.RentalEnd.ToString("dd MMM yyyy")</div>
+                            </div>
+                            <div class="order-row-right">
+                                <div class="order-row-price">@o.TotalPrice.ToString("N0") ج.م</div>
+                                <span class="status-badge status-@o.Status.ToLower()">
+                                    @(o.Status switch { "Active" => "نشط", "Pending" => "انتظار", "Confirmed" => "مؤكد", "Completed" => "مكتمل", _ => o.Status })
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

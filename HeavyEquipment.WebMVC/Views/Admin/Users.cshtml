@@ -1,0 +1,180 @@
+﻿@model HeavyEquipment.Application.Features.Users.Dtos.AdminUsersDto
+@{
+    ViewData["Title"] = "إدارة المستخدمين";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "admin";
+}
+
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">ADMIN — USERS</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">إدارة المستخدمين</h1>
+        </div>
+        <a asp-action="Index" class="btn-outline btn-sm">← لوحة الإدارة</a>
+    </div>
+
+    <div class="dashboard-body">
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card stat-gold">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalUsers</div>
+                    <div class="stat-label">إجمالي المستخدمين</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.VerifiedUsers</div>
+                    <div class="stat-label">موثقون</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <div class="stat-value">@(Model.TotalUsers - Model.VerifiedUsers)</div>
+                    <div class="stat-label">غير موثقين</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🚫</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.BlockedUsers</div>
+                    <div class="stat-label">محظورون</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="admin-filters">
+            <form method="get" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center">
+                <input type="text" name="search" value="@Model.Search"
+                       class="form-control" style="max-width:250px"
+                       placeholder="🔍 ابحث بالاسم أو الإيميل..." />
+                <select name="role" class="form-control" style="max-width:160px">
+                    <option value="">كل الأدوار</option>
+                    <option value="Owner" selected="@(Model.RoleFilter == "Owner" ? "selected" : null)">مالك</option>
+                    <option value="Customer" selected="@(Model.RoleFilter == "Customer" ? "selected" : null)">مستأجر</option>
+                    <option value="Admin" selected="@(Model.RoleFilter == "Admin" ? "selected" : null)">مدير</option>
+                </select>
+                <button type="submit" class="btn-primary btn-sm">بحث</button>
+                @if (!string.IsNullOrEmpty(Model.Search) || !string.IsNullOrEmpty(Model.RoleFilter))
+                {
+                    <a asp-action="Users" class="btn-outline btn-sm">✕ مسح</a>
+                }
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="dashboard-card" style="padding:0">
+            @if (!Model.Users.Any())
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <div class="empty-title">لا توجد نتائج</div>
+                    <div class="empty-desc">جرب تغيير معايير البحث</div>
+                </div>
+            }
+            else
+            {
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>المستخدم</th>
+                                <th>الدور</th>
+                                <th>Trust Score</th>
+                                <th>التحقق</th>
+                                <th>الحالة</th>
+                                <th>تاريخ التسجيل</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var u in Model.Users)
+                            {
+                                <tr class="@(u.IsBlocked ? "row-blocked" : "")">
+                                    <td>
+                                        <div class="admin-user-cell">
+                                            <div class="admin-avatar">@(u.FullName.Length > 0 ? u.FullName[0].ToString() : "?")</div>
+                                            <div>
+                                                <div class="admin-user-name">@u.FullName</div>
+                                                <div class="admin-user-email">@u.Email</div>
+                                                <div class="admin-user-email">📞 @u.Phone</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="role-badge role-@u.Role.ToLower()">
+                                            @(u.Role switch { "Owner" => "🏗 مالك", "Customer" => "🚜 مستأجر", "Admin" => "⚙ مدير", _ => u.Role })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="trust-cell">
+                                            <span style="color:var(--gold); font-weight:700">@u.TrustScore</span>
+                                            <div class="mini-bar">
+                                                <div class="mini-bar-fill" style="width:@u.TrustScore%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (u.IsVerified) { <span class="status-badge status-active">✅ موثق</span> }
+                                        else { <span class="status-badge status-pending">⏳ غير موثق</span> }
+                                    </td>
+                                    <td>
+                                        @if (u.IsBlocked) { <span class="status-badge status-cancelled">🚫 محظور</span> }
+                                        else { <span class="status-badge status-active">✅ نشط</span> }
+                                    </td>
+                                    <td style="color:var(--muted); font-size:0.8rem">
+                                        @u.CreatedAt.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td>
+                                        <div class="admin-actions">
+                                            @if (!u.IsVerified)
+                                            {
+                                                <form asp-action="VerifyUser" method="post" style="display:inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="userId" value="@u.Id" />
+                                                    <button type="submit" class="admin-btn admin-btn-verify"
+                                                            onclick="return confirm('توثيق المستخدم؟')">
+                                                        ✅ توثيق
+                                                    </button>
+                                                </form>
+                                            }
+                                            @if (!u.IsBlocked)
+                                            {
+                                                <form asp-action="BlockUser" method="post" style="display:inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="userId" value="@u.Id" />
+                                                    <button type="submit" class="admin-btn admin-btn-block"
+                                                            onclick="return confirm('حظر المستخدم؟')">
+                                                        🚫 حظر
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="UnblockUser" method="post" style="display:inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="userId" value="@u.Id" />
+                                                    <button type="submit" class="admin-btn admin-btn-unblock"
+                                                            onclick="return confirm('إلغاء حظر المستخدم؟')">
+                                                        ✔ إلغاء الحظر
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

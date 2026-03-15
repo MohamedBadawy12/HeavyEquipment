@@ -1,0 +1,140 @@
+﻿@model HeavyEquipment.Application.Features.Users.Dtos.AdminEquipmentsDto
+@{
+    ViewData["Title"] = "إدارة المعدات";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "admin";
+}
+
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">ADMIN — EQUIPMENTS</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">إدارة المعدات</h1>
+        </div>
+        <a asp-action="Index" class="btn-outline btn-sm">← لوحة الإدارة</a>
+    </div>
+
+    <div class="dashboard-body">
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card stat-gold">
+                <div class="stat-icon">🏗</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.TotalEquipments</div>
+                    <div class="stat-label">إجمالي المعدات</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.AvailableEquipments</div>
+                    <div class="stat-label">متاحة</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔄</div>
+                <div class="stat-content">
+                    <div class="stat-value">@Model.RentedEquipments</div>
+                    <div class="stat-label">مؤجرة</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔧</div>
+                <div class="stat-content">
+                    <div class="stat-value">@(Model.TotalEquipments - Model.AvailableEquipments - Model.RentedEquipments)</div>
+                    <div class="stat-label">تحت الصيانة</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="admin-filters">
+            <form method="get" style="display:flex; gap:1rem; flex-wrap:wrap; align-items:center">
+                <select name="category" class="form-control" style="max-width:180px">
+                    <option value="">كل الفئات</option>
+                    <option value="Crane" selected="@(Model.CategoryFilter == "Crane")">🏗 أوناش</option>
+                    <option value="Excavator" selected="@(Model.CategoryFilter == "Excavator")">⛏ حفارات</option>
+                    <option value="Generator" selected="@(Model.CategoryFilter == "Generator")">⚡ مولدات</option>
+                    <option value="Bulldozer" selected="@(Model.CategoryFilter == "Bulldozer")">🚜 بلدوزر</option>
+                    <option value="Loader" selected="@(Model.CategoryFilter == "Loader")">🚛 لودر</option>
+                </select>
+                <select name="status" class="form-control" style="max-width:160px">
+                    <option value="">كل الحالات</option>
+                    <option value="Available" selected="@(Model.CategoryFilter == "Available")">متاح</option>
+                    <option value="Rented" selected="@(Model.CategoryFilter == "Rented")">مؤجر</option>
+                    <option value="UnderMaintenance" selected="@(Model.CategoryFilter == "UnderMaintenance")">صيانة</option>
+                </select>
+                <button type="submit" class="btn-primary btn-sm">فلتر</button>
+                @if (!string.IsNullOrEmpty(Model.CategoryFilter) || !string.IsNullOrEmpty(Model.StatusFilter))
+                {
+                    <a asp-action="Equipments" class="btn-outline btn-sm">✕ مسح</a>
+                }
+            </form>
+        </div>
+
+        <!-- Table -->
+        <div class="dashboard-card" style="padding:0">
+            @if (!Model.Equipments.Any())
+            {
+                <div class="empty-state">
+                    <div class="empty-icon">🏗</div>
+                    <div class="empty-title">لا توجد معدات</div>
+                    <div class="empty-desc">جرب تغيير معايير الفلتر</div>
+                </div>
+            }
+            else
+            {
+                <div class="admin-table-wrap">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>المعدة</th>
+                                <th>الفئة</th>
+                                <th>المدينة</th>
+                                <th>السعر/ساعة</th>
+                                <th>الحالة</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var e in Model.Equipments)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="admin-user-cell">
+                                            <div class="eq-icon-sm">
+                                                @(e.Category switch { "Crane" => "🏗", "Excavator" => "⛏", "Generator" => "⚡", "Bulldozer" => "🚜", "Loader" => "🚛", _ => "⚙" })
+                                            </div>
+                                            <div class="admin-user-name">@e.Name</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="role-badge role-owner">
+                                            @(e.Category switch { "Crane" => "أوناش", "Excavator" => "حفارات", "Generator" => "مولدات", "Bulldozer" => "بلدوزر", "Loader" => "لودر", _ => e.Category })
+                                        </span>
+                                    </td>
+                                    <td style="color:var(--muted); font-size:0.85rem">📍 @e.City</td>
+                                    <td style="color:var(--gold); font-weight:700">@e.HourlyRate.ToString("N0") ج.م</td>
+                                    <td>
+                                        <span class="status-badge status-@e.Status.ToLower()">
+                                            @(e.Status switch { "Available" => "متاح", "Rented" => "مؤجر", "UnderMaintenance" => "صيانة", _ => e.Status })
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Equipment" asp-action="Details"
+                                           asp-route-id="@e.Id"
+                                           class="admin-btn admin-btn-verify">
+                                            👁 عرض
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
