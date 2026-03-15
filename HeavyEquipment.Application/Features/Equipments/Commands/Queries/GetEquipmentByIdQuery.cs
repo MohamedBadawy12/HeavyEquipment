@@ -26,7 +26,7 @@ namespace HeavyEquipment.Application.Features.Equipments.Commands.Queries
                 e.TotalHoursOperated, e.NextMaintenanceThreshold, e.PhotoUrls.ToList(),
                 e.CurrentLocation.City, e.CurrentLocation.Address,
                 e.CurrentLocation.Latitude, e.CurrentLocation.Longitude, e.OwnerId,
-                e.Owner?.FullName ?? "", e.Owner.TrustScore, e.Owner.IsVerified);
+                e.Owner?.FullName ?? "", e.Owner?.TrustScore ?? 0, e.Owner?.IsVerified ?? false);
 
             return Result<EquipmentDto>.Success(dto);
         }
