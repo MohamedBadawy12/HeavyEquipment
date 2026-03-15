@@ -88,7 +88,9 @@
             <div class="owner-card">
                 <div class="details-section-title">🧑‍💼 معلومات المالك</div>
                 <div class="owner-info">
-                    <div class="owner-avatar">@Model.OwnerName?[0]</div>
+                    <div class="owner-avatar">
+                        @(Model.OwnerName?.Length > 0 ? Model.OwnerName[0].ToString().ToUpper() : "?")
+                    </div>
                     <div>
                         <div class="owner-name">@Model.OwnerName</div>
                         <div class="owner-trust">

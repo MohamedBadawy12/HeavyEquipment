@@ -8,7 +8,7 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Bebas+Neue&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
-
+    
     <style>
         .nav-link-btn {
             display: block;
@@ -66,7 +66,7 @@
     }
 </head>
 <body>
-
+    @* <main class="@(ViewData["NoPageWrapper"] != null ? "" : "page-wrapper")"> *@
     <!-- ===== NAVBAR ===== -->
     <nav class="navbar" id="navbar">
 
@@ -95,12 +95,16 @@
                         ▾
                     </button>
                     <div class="nav-dropdown">
-                        @if (User.IsInRole("Owner")||User.IsInRole("Admin"))
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Admin" asp-action="Index">⚙ لوحة الإدارة</a>
+                        }
+                        @if (User.IsInRole("Owner"))
                         {
                             <a asp-controller="Dashboard" asp-action="Index">📊 لوحة التحكم</a>
                             <a asp-controller="Equipment" asp-action="MyEquipments">🏗 معداتي</a>
                         }
-                        else
+                        @if (User.IsInRole("Customer"))
                         {
                             <a asp-controller="RentalOrder" asp-action="MyOrders">📋 طلباتي</a>
                         }
@@ -213,6 +217,23 @@
          @await RenderSectionAsync("Scripts", required: false)
     }
     <script>
+        // ===== SCROLL REVEAL =====
+        document.addEventListener('DOMContentLoaded', function () {
+            var reveals = document.querySelectorAll('.reveal');
+
+            if (reveals.length === 0) return;
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            reveals.forEach(function (el) { observer.observe(el); });
+        });
         window.toggleMobileMenu = function () {
             var navLinks = document.querySelector('.nav-links');
             if (!navLinks) return;

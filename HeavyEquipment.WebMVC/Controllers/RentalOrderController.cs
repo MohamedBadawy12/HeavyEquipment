@@ -27,14 +27,12 @@ namespace HeavyEquipment.WebMVC.Controllers
             var result = await _mediator.Send(
                 new GetCustomerOrdersQuery(CurrentUserId));
 
-            //if (!result.IsSuccess)
-            //{
-            //    TempData["Error"] = result.Error;
-            //    return RedirectToAction("Index", "Home");
-            //}
-
-            ////return View(result.Value);
-            return View(result);
+            if (!result.IsSuccess)
+            {
+                TempData["Error"] = result.Error;
+                return RedirectToAction("Index", "Home");
+            }
+            return View(result.Value);
         }
 
         public async Task<IActionResult> Details(Guid id)
