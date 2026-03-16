@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeavyEquipment.WebMVC", "HeavyEquipment.WebMVC\HeavyEquipment.WebMVC.csproj", "{C5D4BEF5-A43D-4404-B923-3EC94A081B61}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeavyEquipment.WebMVC", "HeavyEquipment.WebMVC\HeavyEquipment.WebMVC.csproj", "{C5D4BEF5-A43D-4404-B923-3EC94A081B61}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeavyEquipment.Domain", "HeavyEquipment.Domain\HeavyEquipment.Domain.csproj", "{A2DBC675-D72A-474C-A051-F4B949E450D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeavyEquipment.Domain", "HeavyEquipment.Domain\HeavyEquipment.Domain.csproj", "{A2DBC675-D72A-474C-A051-F4B949E450D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeavyEquipment.Application", "HeavyEquipment.Application\HeavyEquipment.Application.csproj", "{2135FE38-C704-454C-BAA3-330081DDAAD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeavyEquipment.Application", "HeavyEquipment.Application\HeavyEquipment.Application.csproj", "{2135FE38-C704-454C-BAA3-330081DDAAD9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeavyEquipment.Infrastructure", "HeavyEquipment.Infrastructure\HeavyEquipment.Infrastructure.csproj", "{7A378FA8-A349-4D67-8149-2B527B76D30B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HeavyEquipment.Infrastructure", "HeavyEquipment.Infrastructure\HeavyEquipment.Infrastructure.csproj", "{7A378FA8-A349-4D67-8149-2B527B76D30B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
