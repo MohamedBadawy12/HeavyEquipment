@@ -1,4 +1,4 @@
-﻿@model HeavyEquipment.Application.Common.Models.Result<System.Collections.Generic.IReadOnlyList<HeavyEquipment.Application.Features.RentalOrders.Dtos.RentalOrderSummaryDto>>
+﻿@model IReadOnlyList<HeavyEquipment.Application.Features.RentalOrders.Dtos.RentalOrderSummaryDto>
 @{
     ViewData["Title"] = "طلباتي";
     Layout = "_NewLayout";
@@ -21,29 +21,28 @@
     </div>
 
     <!-- STATS BAR -->
-    @if (Model.IsSuccess && Model.Value!.Any())
+    @if (Model.Any())
     {
-        var orders = Model.Value!;
         <div class="orders-stats">
             <div class="orders-stat">
-                <div class="orders-stat-value">@orders.Count</div>
+                <div class="orders-stat-value">@Model.Count</div>
                 <div class="orders-stat-label">إجمالي الطلبات</div>
             </div>
             <div class="orders-stat">
                 <div class="orders-stat-value" style="color:#4CAF50">
-                    @orders.Count(o => o.Status == "Active")
+                    @Model.Count(o => o.Status == "Active")
                 </div>
                 <div class="orders-stat-label">نشطة الآن</div>
             </div>
             <div class="orders-stat">
                 <div class="orders-stat-value" style="color:var(--gold)">
-                    @orders.Count(o => o.Status == "Confirmed")
+                    @Model.Count(o => o.Status == "Confirmed")
                 </div>
                 <div class="orders-stat-label">مؤكدة</div>
             </div>
             <div class="orders-stat">
                 <div class="orders-stat-value" style="color:var(--muted)">
-                    @orders.Count(o => o.Status == "Completed")
+                    @Model.Count(o => o.Status == "Completed")
                 </div>
                 <div class="orders-stat-label">مكتملة</div>
             </div>
@@ -52,7 +51,7 @@
 
     <!-- ORDERS LIST -->
     <div class="orders-container">
-        @if (!Model.IsSuccess || !Model.Value!.Any())
+        @if (!Model.Any())
         {
             <div class="empty-state">
                 <div class="empty-icon">📋</div>
@@ -65,7 +64,7 @@
         }
         else
         {
-            @foreach (var order in Model.Value!)
+            @foreach (var order in Model)
             {
                 var (statusClass, statusLabel, statusIcon) = order.Status switch
                 {
@@ -77,6 +76,7 @@
                     "Disputed" => ("status-disputed", "متنازع عليه", "⚠️"),
                     _ => ("status-pending", order.Status, "❓")
                 };
+
                 <div class="order-card">
                     <div class="order-card-header">
                         <div class="order-equip-info">
@@ -121,7 +121,6 @@
                            class="btn-outline btn-sm">
                             عرض التفاصيل
                         </a>
-
                         @if (order.Status == "Pending" || order.Status == "Confirmed")
                         {
                             <a asp-controller="RentalOrder"
