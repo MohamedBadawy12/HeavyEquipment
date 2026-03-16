@@ -1,0 +1,150 @@
+﻿@model IReadOnlyList<HeavyEquipment.Domain.Entities.Notification>
+@{
+    ViewData["Title"] = "الإشعارات";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "pages";
+}
+<style>
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        border: 1px solid var(--border);
+        background: var(--card);
+    }
+
+    .notification-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.2rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.2s;
+        position: relative;
+    }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item:hover {
+            background: rgba(255,255,255,0.02);
+        }
+
+    .notification-unread {
+        background: rgba(212,168,67,0.04);
+        border-right: 3px solid var(--gold);
+    }
+
+    .notification-icon {
+        font-size: 1.4rem;
+        width: 40px;
+        height: 40px;
+        background: rgba(212,168,67,0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .notification-body {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .notification-message {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 0.4rem;
+    }
+
+    .notification-time {
+        font-size: 0.75rem;
+        color: var(--muted);
+        opacity: 0.7;
+    }
+
+    .notification-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--gold);
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 0.4rem;
+    }
+</style>
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">NOTIFICATIONS</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">الإشعارات</h1>
+            <p class="page-header-desc">
+                @Model.Count إشعار —
+                @Model.Count(n => !n.IsRead) غير مقروء
+            </p>
+        </div>
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <form asp-action="MarkAllAsRead" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-outline btn-sm">
+                    ✅ تحديد الكل كمقروء
+                </button>
+            </form>
+        }
+    </div>
+
+    <div style="padding: 2rem 4rem; max-width: 800px">
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">🔔</div>
+                <div class="empty-title">لا توجد إشعارات</div>
+                <div class="empty-desc">ستظهر إشعاراتك هنا عند وجودها</div>
+            </div>
+        }
+        else
+        {
+            <div class="notifications-list">
+                @foreach (var n in Model.OrderByDescending(x => x.CreatedAt))
+                {
+                    <div class="notification-item @(!n.IsRead ? "notification-unread" : "")">
+                        <div class="notification-icon">
+                            @(n.Type.ToString() switch
+                            {
+                                "RentalConfirmed" => "✅",
+                                "RentalStarted" => "🚀",
+                                "RentalCompleted" => "🏁",
+                                "RentalCancelled" => "❌",
+                                "System" => "⚙️",
+                                _ => "🔔"
+                            })
+                        </div>
+                        <div class="notification-body">
+                            <div class="notification-title">@n.Title</div>
+                            <div class="notification-message">@n.Message</div>
+                            <div class="notification-time">
+                                @n.CreatedAt.ToString("dd MMM yyyy — hh:mm tt")
+                            </div>
+                        </div>
+                        @if (!n.IsRead)
+                        {
+                            <div class="notification-dot"></div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+
