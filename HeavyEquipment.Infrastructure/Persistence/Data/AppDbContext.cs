@@ -48,6 +48,11 @@ namespace HeavyEquipment.Infrastructure.Persistence.Data
                 .SelectMany(e => e.Entity.DomainEvents)
                 .ToList();
 
+            ChangeTracker
+                .Entries<BaseEntity>()
+                .ToList()
+                .ForEach(e => e.Entity.ClearDomainEvents());
+
             var result = await base.SaveChangesAsync(cancellationToken);
 
             if (_mediator is not null)
@@ -55,11 +60,6 @@ namespace HeavyEquipment.Infrastructure.Persistence.Data
                 foreach (var domainEvent in domainEvents)
                     await _mediator.Publish(domainEvent, cancellationToken);
             }
-
-            ChangeTracker
-                .Entries<BaseEntity>()
-                .ToList()
-                .ForEach(e => e.Entity.ClearDomainEvents());
 
             return result;
         }

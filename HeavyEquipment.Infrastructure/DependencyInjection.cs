@@ -1,6 +1,7 @@
 ﻿using HeavyEquipment.Domain.Interfaces;
 using HeavyEquipment.Infrastructure.Persistence.Data;
 using HeavyEquipment.Infrastructure.Persistence.Repositories;
+using HeavyEquipment.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,8 @@ namespace HeavyEquipment.Infrastructure
                 ));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IEmailService, SendGridEmailService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             return services;
         }
