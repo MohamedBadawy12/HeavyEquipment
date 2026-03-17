@@ -18,5 +18,6 @@ namespace HeavyEquipment.WebMVC.ViewModels.Dashboard
         public decimal MonthRevenue { get; set; }
         public List<EquipmentSummaryDto> Equipments { get; set; } = new();
         public List<RentalOrderSummaryDto> RecentOrders { get; set; } = new();
+        public List<RentalOrderSummaryDto> PendingOrders { get; set; } = new();
     }
 }

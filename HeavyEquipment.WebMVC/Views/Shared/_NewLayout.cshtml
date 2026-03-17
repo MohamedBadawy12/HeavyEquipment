@@ -109,7 +109,21 @@
                             <a asp-controller="RentalOrder" asp-action="MyOrders">📋 طلباتي</a>
                         }
                         <a asp-controller="Account" asp-action="Profile">👤 الملف الشخصي</a>
-                        <a asp-controller="Notification" asp-action="Index">🔔 الإشعارات</a>
+                        <a asp-controller="Notification" asp-action="Index">
+                            🔔 الإشعارات
+                            @if (User.Identity!.IsAuthenticated)
+                            {
+                                @* هنحتاج نجيب العدد من ViewBag *@
+                                @if (ViewBag.UnreadCount != null && (int)ViewBag.UnreadCount > 0)
+                                {
+                                    <span style="background:var(--gold);color:var(--black);
+                         border-radius:50%;padding:0.1rem 0.4rem;
+                         font-size:0.65rem;font-weight:700;margin-right:0.3rem">
+                                        @ViewBag.UnreadCount
+                                    </span>
+                                }
+                            }
+                        </a>
                         <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0; padding:0">
                             @Html.AntiForgeryToken()
                             <button type="submit" class="nav-link-btn danger">

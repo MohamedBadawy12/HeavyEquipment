@@ -5,6 +5,35 @@
     ViewData["PageCss"] = "dashboard";
 }
 
+<style>
+    .admin-btn {
+        padding: 0.4rem 0.9rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        font-family: var(--font-ar);
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .admin-btn-verify {
+        background: rgba(76,175,80,0.15);
+        color: #4CAF50;
+        border: 1px solid rgba(76,175,80,0.4);
+    }
+
+    .admin-btn-unblock {
+        background: rgba(212,168,67,0.15);
+        color: var(--gold);
+        border: 1px solid rgba(212,168,67,0.4);
+    }
+
+    .admin-btn:hover {
+        opacity: 0.85;
+        transform: translateY(-1px);
+    }
+</style>
 <div class="inner-page">
 
     <!-- PAGE HEADER -->
@@ -16,33 +45,23 @@
             <p class="page-header-desc">مرحباً! هنا ملخص كامل لأداء معداتك وإيراداتك.</p>
         </div>
         <div style="display:flex; gap:1rem; flex-wrap:wrap">
-            <a asp-controller="Equipment" asp-action="Create" class="btn-primary">
-                ➕ إضافة معدة
-            </a>
-            <a asp-controller="Equipment" asp-action="MyEquipments" class="btn-outline">
-                🏗 إدارة المعدات
-            </a>
+            <a asp-controller="Equipment" asp-action="Create" class="btn-primary">➕ إضافة معدة</a>
+            <a asp-controller="Equipment" asp-action="MyEquipments" class="btn-outline">🏗 إدارة المعدات</a>
         </div>
     </div>
 
     <div class="dashboard-body">
 
-        <!-- ===== ROW 1: STATS ===== -->
+        <!-- STATS -->
         <div class="stats-grid">
-
-            <!-- إجمالي الإيرادات -->
             <div class="stat-card stat-gold">
                 <div class="stat-icon">💰</div>
                 <div class="stat-content">
                     <div class="stat-value">@Model.TotalRevenue.ToString("N0") <span>ج.م</span></div>
                     <div class="stat-label">إجمالي الإيرادات</div>
                 </div>
-                <div class="stat-sub">
-                    هذا الشهر: @Model.MonthRevenue.ToString("N0") ج.م
-                </div>
+                <div class="stat-sub">هذا الشهر: @Model.MonthRevenue.ToString("N0") ج.م</div>
             </div>
-
-            <!-- المعدات -->
             <div class="stat-card">
                 <div class="stat-icon">🏗</div>
                 <div class="stat-content">
@@ -51,12 +70,10 @@
                 </div>
                 <div class="stat-sub">
                     <span class="dot-green"></span> @Model.AvailableEquipments متاحة &nbsp;
-                    <span class="dot-gold"></span> @Model.RentedEquipments مؤجرة &nbsp;
-                    <span class="dot-red"></span> @Model.UnderMaintenance صيانة
+                    <span class="dot-gold"></span>  @Model.RentedEquipments مؤجرة &nbsp;
+                    <span class="dot-red"></span>   @Model.UnderMaintenance صيانة
                 </div>
             </div>
-
-            <!-- الطلبات النشطة -->
             <div class="stat-card">
                 <div class="stat-icon">📋</div>
                 <div class="stat-content">
@@ -67,8 +84,6 @@
                     @Model.PendingRentals في الانتظار · @Model.CompletedRentals مكتملة
                 </div>
             </div>
-
-            <!-- معدل الإشغال -->
             <div class="stat-card">
                 <div class="stat-icon">📊</div>
                 <div class="stat-content">
@@ -84,21 +99,67 @@
                     <div class="stat-progress-fill" style="width:@occupancy%"></div>
                 </div>
             </div>
-
         </div>
 
-        <!-- ===== ROW 2: RECENT ORDERS + EQUIPMENTS ===== -->
+        <!-- PENDING ORDERS — تحتاج تأكيد -->
+        @if (Model.PendingOrders.Any())
+        {
+            <div class="dashboard-card" style="border-color:rgba(212,168,67,0.5)">
+                <div class="dashboard-card-header" style="background:rgba(212,168,67,0.05)">
+                    <div class="dashboard-card-title">
+                        ⏳ طلبات تحتاج تأكيد
+                        <span style="background:var(--gold);color:var(--black);padding:0.1rem 0.6rem;font-size:0.75rem;font-weight:700;margin-right:0.5rem">
+                            @Model.PendingOrders.Count
+                        </span>
+                    </div>
+                </div>
+                <div class="orders-list">
+                    @foreach (var order in Model.PendingOrders)
+                    {
+                        <div class="order-row">
+                            <div class="order-row-info">
+                                <div class="order-row-name">@order.EquipmentName</div>
+                                <div class="order-row-dates">
+                                    @order.RentalStart.ToString("dd MMM") — @order.RentalEnd.ToString("dd MMM yyyy")
+                                    · @((order.RentalEnd - order.RentalStart).Days) يوم
+                                </div>
+                            </div>
+                            <div class="order-row-right">
+                                <div class="order-row-price">@order.TotalPrice.ToString("N0") ج.م</div>
+                                <div style="display:flex; gap:0.4rem; margin-top:0.4rem; flex-wrap:wrap">
+                                    <form asp-controller="RentalOrder" asp-action="Confirm"
+                                          method="post" style="display:inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@order.Id" />
+                                        <button type="submit" class="admin-btn admin-btn-verify"
+                                                onclick="return confirm('تأكيد طلب الإيجار؟')">
+                                            ✅ تأكيد
+                                        </button>
+                                    </form>
+                                    <a asp-controller="RentalOrder" asp-action="Details"
+                                       asp-route-id="@order.Id"
+                                       class="admin-btn admin-btn-unblock">
+                                        👁 عرض
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- RECENT ORDERS + EQUIPMENTS -->
         <div class="dashboard-grid">
 
-            <!-- الطلبات الأخيرة -->
+            <!-- الطلبات النشطة والمؤكدة -->
             <div class="dashboard-card">
                 <div class="dashboard-card-header">
-                    <div class="dashboard-card-title">📋 الطلبات النشطة</div>
-                    <a asp-controller="RentalOrder" asp-action="MyOrders" class="dashboard-card-link">
+                    <div class="dashboard-card-title">📋 الطلبات النشطة والمؤكدة</div>
+                    <a asp-controller="RentalOrder" asp-action="OwnerOrders" class="dashboard-card-link">
                         عرض الكل ←
                     </a>
                 </div>
-
                 @if (!Model.RecentOrders.Any())
                 {
                     <div class="empty-state" style="padding:3rem 1rem">
@@ -124,13 +185,16 @@
                                     <span class="status-badge status-@order.Status.ToLower()">
                                         @(order.Status switch
                                         {
-                                            "Active" => "نشط",
-                                            "Confirmed" => "مؤكد",
-                                            "Pending" => "انتظار",
-                                            "Completed" => "مكتمل",
+                                            "Active" => "🟢 نشط",
+                                            "Confirmed" => "✅ مؤكد",
                                             _ => order.Status
                                         })
                                     </span>
+                                    <a asp-controller="RentalOrder" asp-action="Details"
+                                       asp-route-id="@order.Id"
+                                       style="font-size:0.75rem;color:var(--gold);text-decoration:none;margin-top:0.2rem">
+                                        عرض التفاصيل ←
+                                    </a>
                                 </div>
                             </div>
                         }
@@ -146,13 +210,13 @@
                         إدارة الكل ←
                     </a>
                 </div>
-
                 @if (!Model.Equipments.Any())
                 {
                     <div class="empty-state" style="padding:3rem 1rem">
                         <div class="empty-icon">🏚</div>
                         <div class="empty-title">لا توجد معدات مسجلة</div>
-                        <a asp-controller="Equipment" asp-action="Create" class="btn-primary btn-sm" style="margin-top:1rem">
+                        <a asp-controller="Equipment" asp-action="Create"
+                           class="btn-primary btn-sm" style="margin-top:1rem">
                             ➕ أضف معدتك الأولى
                         </a>
                     </div>
@@ -195,8 +259,6 @@
                     </div>
                 }
             </div>
-
         </div>
-
     </div>
 </div>

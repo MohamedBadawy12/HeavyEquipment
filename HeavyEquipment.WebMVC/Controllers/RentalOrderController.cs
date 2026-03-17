@@ -1,7 +1,10 @@
-﻿using HeavyEquipment.Application.Features.RentalOrders.Commands.Cancel;
+﻿using HeavyEquipment.Application.Features.Equipments.Commands.Queries;
+using HeavyEquipment.Application.Features.RentalOrders.Commands.Cancel;
 using HeavyEquipment.Application.Features.RentalOrders.Commands.Confirm;
 using HeavyEquipment.Application.Features.RentalOrders.Commands.Create;
 using HeavyEquipment.Application.Features.RentalOrders.Commands.Queries;
+using HeavyEquipment.Application.Features.RentalOrders.Dtos;
+using HeavyEquipment.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,18 +13,18 @@ using System.Security.Claims;
 namespace HeavyEquipment.WebMVC.Controllers
 {
     [Authorize]
-    public class RentalOrderController : Controller
+    public class RentalOrderController : BaseController
     {
         private readonly IMediator _mediator;
 
-        public RentalOrderController(IMediator mediator)
+        public RentalOrderController(IMediator mediator, IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _mediator = mediator;
         }
         private Guid CurrentUserId =>
             Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> MyOrders()
         {
             var result = await _mediator.Send(
@@ -33,6 +36,25 @@ namespace HeavyEquipment.WebMVC.Controllers
                 return RedirectToAction("Index", "Home");
             }
             return View(result.Value);
+        }
+
+        [Authorize(Roles = "Owner")]
+        public async Task<IActionResult> OwnerOrders()
+        {
+            var activeOrders = await _mediator.Send(new GetActiveOrdersQuery());
+
+            // جيب معدات الـ Owner الأول
+            var equipments = (await _mediator.Send(
+                new GetEquipmentsByOwnerQuery(CurrentUserId)))?.ToList() ?? new();
+
+            var ownerEquipmentIds = equipments.Select(e => e.Id).ToHashSet();
+
+            var ownerOrders = (activeOrders ?? new List<RentalOrderSummaryDto>())
+                .Where(o => ownerEquipmentIds.Contains(o.EquipmentId))
+                .OrderByDescending(o => o.RentalStart)
+                .ToList();
+
+            return View("MyOrders", ownerOrders);
         }
 
         public async Task<IActionResult> Details(Guid id)
@@ -49,9 +71,14 @@ namespace HeavyEquipment.WebMVC.Controllers
         }
 
         [Authorize(Roles = "Customer")]
-        public IActionResult Create(Guid equipmentId)
+        public async Task<IActionResult> Create(Guid equipmentId)
         {
+            var result = await _mediator.Send(new GetEquipmentByIdQuery(equipmentId));
+            if (!result.IsSuccess) return RedirectToAction("Index", "Equipment");
+
             ViewBag.EquipmentId = equipmentId;
+            ViewBag.HourlyRate = result.Value!.HourlyRate;
+            ViewBag.EquipmentName = result.Value!.Name;
             return View();
         }
 
