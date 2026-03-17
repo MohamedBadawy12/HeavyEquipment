@@ -1,6 +1,7 @@
 ﻿using HeavyEquipment.Domain.Entities;
 using HeavyEquipment.Domain.Enums;
 using HeavyEquipment.Domain.Exceptions;
+using HeavyEquipment.Domain.Interfaces;
 using HeavyEquipment.WebMVC.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,14 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeavyEquipment.WebMVC.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
         public AccountController(
             UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager)
+            SignInManager<AppUser> signInManager, IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;

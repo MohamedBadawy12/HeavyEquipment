@@ -2,6 +2,7 @@
 using HeavyEquipment.Application.Features.Equipments.Commands.Queries;
 using HeavyEquipment.Application.Features.Equipments.Commands.Update;
 using HeavyEquipment.Domain.Enums;
+using HeavyEquipment.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,12 +10,12 @@ using System.Security.Claims;
 
 namespace HeavyEquipment.WebMVC.Controllers
 {
-    public class EquipmentController : Controller
+    public class EquipmentController : BaseController
     {
         private readonly IMediator _mediator;
         private Guid CurrentUserId =>
            Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        public EquipmentController(IMediator mediator)
+        public EquipmentController(IMediator mediator, IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _mediator = mediator;
         }

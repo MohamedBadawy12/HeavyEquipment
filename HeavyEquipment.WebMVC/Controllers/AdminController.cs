@@ -1,5 +1,6 @@
 ﻿using HeavyEquipment.Application.Features.Users.Commands;
 using HeavyEquipment.Application.Features.Users.Commands.Queries;
+using HeavyEquipment.Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,10 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace HeavyEquipment.WebMVC.Controllers
 {
     [Authorize(Roles = "Admin")]
-    public class AdminController : Controller
+    public class AdminController : BaseController
     {
         private readonly IMediator _mediator;
-        public AdminController(IMediator mediator) => _mediator = mediator;
+        public AdminController(IMediator mediator, IUnitOfWork unitOfWork) : base(unitOfWork)
+        {
+            _mediator = mediator;
+        }
 
         public async Task<IActionResult> Index()
         {
