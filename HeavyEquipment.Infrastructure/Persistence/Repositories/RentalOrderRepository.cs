@@ -13,10 +13,12 @@ namespace HeavyEquipment.Infrastructure.Persistence.Repositories
         public async Task<IReadOnlyList<RentalOrder>> GetActiveOrdersAsync(CancellationToken ct = default)
         {
             return await _dbSet
-                .Where(r => r.Status == OrderStatus.Active)
-                .Include(r => r.Equipment)
-                .Include(r => r.Customer)
-                .ToListAsync(ct);
+            .Where(r => r.Status == OrderStatus.Active
+                     || r.Status == OrderStatus.Pending
+                     || r.Status == OrderStatus.Confirmed)
+            .Include(r => r.Equipment)
+            .Include(r => r.Customer)
+            .ToListAsync(ct);
         }
 
         public async Task<IReadOnlyList<RentalOrder>> GetByCustomerIdAsync(Guid customerId,
