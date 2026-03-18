@@ -11,5 +11,7 @@ namespace HeavyEquipment.Domain.Interfaces
             , CancellationToken ct = default);
         Task<IReadOnlyList<RentalOrder>> GetOverdueOrdersAsync(CancellationToken ct = default);
         Task<RentalOrder?> GetWithDetailsAsync(Guid orderId, CancellationToken ct = default);
+        Task<IReadOnlyList<RentalOrder>> GetByEquipmentOwnerIdAsync(
+            Guid ownerId, CancellationToken ct = default);
     }
 }

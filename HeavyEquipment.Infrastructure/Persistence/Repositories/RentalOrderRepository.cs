@@ -71,5 +71,16 @@ namespace HeavyEquipment.Infrastructure.Persistence.Repositories
                 r.RentalStart < to &&
                 r.RentalEnd > from, ct);
         }
+
+        public async Task<IReadOnlyList<RentalOrder>> GetByEquipmentOwnerIdAsync(
+         Guid ownerId, CancellationToken ct = default)
+        {
+            return await _dbSet
+                 .Where(r => r.Equipment!.OwnerId == ownerId)
+                 .Include(r => r.Equipment)
+                 .Include(r => r.Customer)
+                 .OrderByDescending(r => r.CreatedAt)
+                 .ToListAsync(ct);
+        }
     }
 }
