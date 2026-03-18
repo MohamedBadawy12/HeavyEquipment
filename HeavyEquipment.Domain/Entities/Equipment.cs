@@ -12,7 +12,7 @@ namespace HeavyEquipment.Domain.Entities
     {
         public string Name { get; private set; }
         public string Description { get; private set; }
-        public string Model { get; private set; }               // موديل المعدة
+        public string Model { get; private set; }
         public int ManufactureYear { get; private set; }
         public EquipmentCategory Category { get; private set; }
         public EquipmentStatus Status { get; private set; }
