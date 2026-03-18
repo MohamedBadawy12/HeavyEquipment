@@ -1,4 +1,5 @@
-﻿using HeavyEquipment.Application.Features.Users.Commands;
+﻿using HeavyEquipment.Application.Features.Logistics.Commands;
+using HeavyEquipment.Application.Features.Users.Commands;
 using HeavyEquipment.Application.Features.Users.Commands.Queries;
 using HeavyEquipment.Domain.Interfaces;
 using MediatR;
@@ -69,6 +70,42 @@ namespace HeavyEquipment.WebMVC.Controllers
             var result = await _mediator.Send(new GetAdminOrdersQuery(status));
             if (!result.IsSuccess) return View("Error");
             return View(result.Value);
+        }
+
+        public async Task<IActionResult> Logistics()
+        {
+            var result = await _mediator.Send(new GetAllLogisticsProvidersQuery());
+            if (!result.IsSuccess) return View("Error");
+            return View(result.Value);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateLogistics(
+            string companyName, string contactNumber, decimal ratePerKilometer)
+        {
+            var result = await _mediator.Send(
+                new CreateLogisticsProviderCommand(companyName, contactNumber, ratePerKilometer));
+            TempData[result.IsSuccess ? "Success" : "Error"] =
+                result.IsSuccess ? "تم إضافة شركة النقل بنجاح ✅" : result.Error;
+            return RedirectToAction(nameof(Logistics));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleLogistics(Guid id)
+        {
+            var result = await _mediator.Send(new ToggleLogisticsProviderCommand(id));
+            TempData[result.IsSuccess ? "Success" : "Error"] =
+                result.IsSuccess ? "تم تحديث حالة شركة النقل ✅" : result.Error;
+            return RedirectToAction(nameof(Logistics));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateLogisticsRate(Guid id, decimal newRate)
+        {
+            var result = await _mediator.Send(new UpdateLogisticsRateCommand(id, newRate));
+            TempData[result.IsSuccess ? "Success" : "Error"] =
+                result.IsSuccess ? "تم تحديث السعر بنجاح ✅" : result.Error;
+            return RedirectToAction(nameof(Logistics));
         }
     }
 }
