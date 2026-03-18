@@ -27,10 +27,13 @@ namespace HeavyEquipment.WebMVC.Controllers
             var equipments = (await _mediator.Send(
                 new GetEquipmentsByOwnerQuery(CurrentUserId)))?.ToList() ?? new();
 
-            var allOrdersResult = await _mediator.Send(new GetCustomerOrdersQuery(CurrentUserId));
-            var allOrders = allOrdersResult?.Value?.ToList() ?? new();
+            // كل طلبات معدات الـ Owner (بما فيها Completed)
+            var allOrders = (await _mediator.Send(
+                new GetOrdersByOwnerQuery(CurrentUserId)))?.ToList() ?? new();
 
-            var activeOrders = (await _mediator.Send(new GetActiveOrdersQuery()))?.ToList() ?? new();
+            // الطلبات النشطة (Pending + Confirmed + Active)
+            var activeOrders = (await _mediator.Send(
+                new GetActiveOrdersQuery()))?.ToList() ?? new();
 
             var ownerEquipmentIds = equipments.Select(e => e.Id).ToHashSet();
 
@@ -49,6 +52,8 @@ namespace HeavyEquipment.WebMVC.Controllers
 
                 ActiveRentals = ownerActiveOrders.Count(o => o.Status == OrderStatus.Active.ToString()),
                 PendingRentals = ownerActiveOrders.Count(o => o.Status == OrderStatus.Pending.ToString()),
+
+                // من allOrders عشان يشمل الـ Completed
                 CompletedRentals = allOrders.Count(o => o.Status == OrderStatus.Completed.ToString()),
 
                 TotalRevenue = allOrders

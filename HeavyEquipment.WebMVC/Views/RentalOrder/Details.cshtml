@@ -103,7 +103,6 @@
                         ❌ سبب الإلغاء: @Model.CancellationReason
                     </div>
                 }
-
                 @if (!string.IsNullOrEmpty(Model.DisputeReason))
                 {
                     <div class="alert alert-warning" style="margin-top:1rem">
@@ -112,7 +111,7 @@
                 }
             </div>
 
-            <!-- Owner Actions (لو المستخدم مالك) -->
+            <!-- ===== OWNER ACTIONS ===== -->
             @if (User.IsInRole("Owner"))
             {
                 <div class="details-info-card">
@@ -130,23 +129,103 @@
 
                         @if (Model.Status == "Confirmed")
                         {
+                            <!-- بدء التأجير -->
                             <form asp-action="MarkAsActive" asp-controller="RentalOrder" method="post">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@Model.Id" />
                                 <button type="submit" class="btn-primary btn-full">🚀 بدء التأجير</button>
                             </form>
+
+                            <!-- تعيين شركة نقل -->
+                            <a asp-controller="OrderExtras" asp-action="AssignLogistics"
+                               asp-route-orderId="@Model.Id"
+                               class="btn-outline btn-full" style="text-align:center;display:block">
+                                🚛 تعيين شركة النقل
+                            </a>
+
+                            <!-- فحص ما قبل التسليم -->
+                            <a asp-controller="OrderExtras" asp-action="AddInspection"
+                               asp-route-orderId="@Model.Id"
+                               class="btn-outline btn-full" style="text-align:center;display:block">
+                                📋 فحص قبل التسليم
+                            </a>
                         }
 
                         @if (Model.Status == "Active")
                         {
+                            <!-- إتمام الطلب -->
                             <a asp-action="Complete" asp-controller="RentalOrder"
-                               asp-route-id="@Model.Id" class="btn-primary btn-full" style="text-align:center;display:block">
+                               asp-route-id="@Model.Id"
+                               class="btn-primary btn-full" style="text-align:center;display:block">
                                 🏁 إتمام الطلب
+                            </a>
+
+                            <!-- فحص ما بعد الاستلام -->
+                            <a asp-controller="OrderExtras" asp-action="AddInspection"
+                               asp-route-orderId="@Model.Id"
+                               class="btn-outline btn-full" style="text-align:center;display:block">
+                                📋 فحص بعد الاستلام
                             </a>
                         }
                     </div>
                 </div>
             }
+
+            <!-- ===== CUSTOMER ACTIONS ===== -->
+            @if (!User.IsInRole("Owner"))
+            {
+                @if (Model.Status == "Confirmed" && !Model.HasInsurance)
+                {
+                    <div class="details-info-card">
+                        <div class="details-section-title">🔒 التأمين</div>
+                        <p style="color:var(--muted);font-size:0.875rem;margin-bottom:1rem">
+                            أضف تأمين لحماية طلبك في حالة الأضرار أو الحوادث.
+                        </p>
+                        <a asp-controller="OrderExtras" asp-action="AddInsurance"
+                           asp-route-orderId="@Model.Id"
+                           class="btn-outline btn-full" style="text-align:center;display:block">
+                            🔒 إضافة تأمين
+                        </a>
+                    </div>
+                }
+
+                @if (Model.HasInsurance)
+                {
+                    <div class="details-info-card">
+                        <div class="details-section-title">🔒 التأمين</div>
+                        <div class="alert alert-success" style="margin:0">
+                            ✅ الطلب مؤمّن — تمت إضافة وثيقة التأمين بنجاح
+                        </div>
+                    </div>
+                }
+            }
+
+            <!-- ===== INSPECTIONS ===== -->
+            @if (Model.InspectionsCount > 0)
+            {
+                <div class="details-info-card">
+                    <div class="details-section-title">📋 تقارير الفحص (@Model.InspectionsCount)</div>
+                    <div style="color:var(--muted);font-size:0.875rem">
+                        تم إجراء @Model.InspectionsCount تقرير فحص لهذا الطلب.
+                    </div>
+                </div>
+            }
+
+            <!-- ===== LOGISTICS ===== -->
+            @if (!string.IsNullOrEmpty(Model.LogisticsProviderName))
+            {
+                <div class="details-info-card">
+                    <div class="details-section-title">🚛 شركة النقل</div>
+                    <div style="display:flex;align-items:center;gap:0.8rem">
+                        <div style="font-size:1.5rem">🚛</div>
+                        <div>
+                            <div style="font-weight:700">@Model.LogisticsProviderName</div>
+                            <div style="color:var(--muted);font-size:0.8rem">تم تعيين شركة النقل</div>
+                        </div>
+                    </div>
+                </div>
+            }
+
         </div>
 
         <!-- SIDEBAR -->
@@ -161,28 +240,35 @@
                         <span class="booking-price-currency">ج.م</span>
                     </div>
                 </div>
-                <div style="padding:1.2rem 1.5rem; display:flex; flex-direction:column; gap:0.7rem">
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                <div style="padding:1.2rem 1.5rem;display:flex;flex-direction:column;gap:0.7rem">
+                    <div style="display:flex;justify-content:space-between;font-size:0.85rem">
                         <span style="color:var(--muted)">سعر الساعة</span>
                         <span>@Model.HourlyRate.ToString("N0") ج.م</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.85rem">
+                    <div style="display:flex;justify-content:space-between;font-size:0.85rem">
                         <span style="color:var(--muted)">المدة</span>
                         <span>@((Model.RentalEnd - Model.RentalStart).Days) يوم</span>
                     </div>
-                    <div style="border-top:1px solid var(--border); padding-top:0.7rem; display:flex; justify-content:space-between; font-weight:700">
+                    @if (Model.HasInsurance)
+                    {
+                        <div style="display:flex;justify-content:space-between;font-size:0.85rem">
+                            <span style="color:var(--muted)">التأمين</span>
+                            <span style="color:var(--green)">✅ مؤمّن</span>
+                        </div>
+                    }
+                    <div style="border-top:1px solid var(--border);padding-top:0.7rem;display:flex;justify-content:space-between;font-weight:700">
                         <span>الإجمالي</span>
                         <span style="color:var(--gold)">@Model.TotalPrice.ToString("N0") ج.م</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Cancel Button (للعميل) -->
+            <!-- Cancel Button -->
             @if (!User.IsInRole("Owner") && (Model.Status == "Pending" || Model.Status == "Confirmed"))
             {
                 <a asp-action="Cancel" asp-controller="RentalOrder"
                    asp-route-id="@Model.Id"
-                   class="btn-danger btn-full" style="text-align:center; display:block">
+                   class="btn-danger btn-full" style="text-align:center;display:block">
                     ❌ إلغاء الطلب
                 </a>
             }
@@ -192,7 +278,7 @@
                 <div class="details-section-title">🏗 المعدة</div>
                 <a asp-controller="Equipment" asp-action="Details"
                    asp-route-id="@Model.EquipmentId"
-                   style="color:var(--gold); text-decoration:none; font-weight:700; font-size:0.9rem">
+                   style="color:var(--gold);text-decoration:none;font-weight:700;font-size:0.9rem">
                     @Model.EquipmentName ←
                 </a>
             </div>
