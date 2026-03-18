@@ -1,0 +1,71 @@
+﻿@{
+    ViewData["Title"] = "إضافة تأمين";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "rental";
+}
+
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">INSURANCE</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">إضافة تأمين</h1>
+            <p class="page-header-desc">أضف وثيقة تأمين لحماية طلب الإيجار</p>
+        </div>
+        <a asp-controller="RentalOrder" asp-action="Details"
+           asp-route-id="@ViewBag.OrderId" class="btn-outline btn-sm">
+            ← رجوع
+        </a>
+    </div>
+
+    <div style="padding:2rem 4rem; max-width:600px">
+
+        <form asp-action="AddInsurance" asp-controller="OrderExtras" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+
+            <div class="form-section-card" style="background:var(--card);border:1px solid var(--border);padding:2rem">
+
+                <div class="form-group">
+                    <label class="form-label">مبلغ التغطية (ج.م) *</label>
+                    <input type="number" name="coverageAmount" class="form-control"
+                           placeholder="مثال: 50000" min="1" required />
+                    <small style="color:var(--muted);font-size:0.78rem;margin-top:0.3rem;display:block">
+                        المبلغ الأقصى الذي يغطيه التأمين في حالة الأضرار
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">قيمة القسط (ج.م) *</label>
+                    <input type="number" name="premiumAmount" class="form-control"
+                           placeholder="مثال: 500" min="1" required />
+                    <small style="color:var(--muted);font-size:0.78rem;margin-top:0.3rem;display:block">
+                        المبلغ الذي تدفعه مقابل التأمين
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">تاريخ انتهاء الوثيقة *</label>
+                    <input type="date" name="expiryDate" class="form-control"
+                           min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div style="background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.2);padding:1rem;margin-bottom:1.5rem">
+                    <div style="color:var(--gold);font-weight:700;margin-bottom:0.5rem">⚠️ ملاحظة مهمة</div>
+                    <div style="color:var(--muted);font-size:0.85rem">
+                        بإضافة التأمين أنت توافق على شروط التأمين وسياسة المطالبات.
+                        لا يمكن تعديل وثيقة التأمين بعد إضافتها.
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:1rem;justify-content:flex-end">
+                    <a asp-controller="RentalOrder" asp-action="Details"
+                       asp-route-id="@ViewBag.OrderId" class="btn-outline">
+                        إلغاء
+                    </a>
+                    <button type="submit" class="btn-primary">🔒 إضافة التأمين</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

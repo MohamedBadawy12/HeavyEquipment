@@ -1,0 +1,70 @@
+﻿@{
+    ViewData["Title"] = "إضافة تقرير فحص";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "rental";
+}
+
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">INSPECTION</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">تقرير الفحص</h1>
+            <p class="page-header-desc">سجّل حالة المعدة قبل أو بعد التسليم</p>
+        </div>
+        <a asp-controller="RentalOrder" asp-action="Details"
+           asp-route-id="@ViewBag.OrderId" class="btn-outline btn-sm">
+            ← رجوع
+        </a>
+    </div>
+
+    <div style="padding:2rem 4rem; max-width:600px">
+
+        <form asp-action="AddInspection" asp-controller="OrderExtras" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+
+            <div style="background:var(--card);border:1px solid var(--border);padding:2rem">
+
+                <div class="form-group">
+                    <label class="form-label">نوع الفحص *</label>
+                    <select name="type" class="form-control" required>
+                        <option value="">اختر نوع الفحص</option>
+                        <option value="1">🔍 فحص قبل التسليم (PreRental)</option>
+                        <option value="2">🔍 فحص بعد الاستلام (PostRental)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">نتيجة الفحص *</label>
+                    <select name="result" class="form-control" required>
+                        <option value="">اختر النتيجة</option>
+                        <option value="1">✅ ناجح (Passed)</option>
+                        <option value="2">❌ فاشل (Failed)</option>
+                        <option value="3">⚠️ ناجح مع ملاحظات (PassedWithIssues)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">قراءة عداد الساعات *</label>
+                    <input type="number" name="hoursReading" class="form-control"
+                           placeholder="مثال: 1250" min="0" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ملاحظات</label>
+                    <textarea name="notes" class="form-control" rows="4"
+                              placeholder="اكتب ملاحظاتك عن حالة المعدة..."></textarea>
+                </div>
+
+                <div style="display:flex;gap:1rem;justify-content:flex-end">
+                    <a asp-controller="RentalOrder" asp-action="Details"
+                       asp-route-id="@ViewBag.OrderId" class="btn-outline">
+                        إلغاء
+                    </a>
+                    <button type="submit" class="btn-primary">📋 حفظ التقرير</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
