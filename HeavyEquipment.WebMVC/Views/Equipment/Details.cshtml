@@ -18,38 +18,64 @@
 
     <div class="details-layout">
 
-        <!-- ===== RIGHT COLUMN — Main Info ===== -->
         <div class="details-main">
 
-            <!-- Image / Icon Section -->
-            <div class="details-image-section">
-                <div class="details-image">
-                    @switch (Model.Category)
+            @if (Model.PhotoUrls.Any())
+            {
+                <div style="margin-bottom:1.5rem">
+                    <img src="@Model.PhotoUrls.First()" alt="صورة المعدة" class="main-photo"
+                         style="width:100%;height:350px;object-fit:contain;
+                    background:#0f1115;border:1px solid var(--border);
+                    margin-bottom:0.5rem" />
+
+                    @if (Model.PhotoUrls.Count > 1)
                     {
-                        case "Crane":
-                            <text>🏗</text>
-                            break;
-                        case "Excavator":
-                            <text>🚜</text>
-                            break;
-                        case "Generator":
-                            <text>⚡</text>
-                            break;
-                        case "Bulldozer":
-                            <text>🚧</text>
-                            break;
-                        default:
-                            <text>🔧</text>
-                            break;
+                        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem">
+                            @foreach (var url in Model.PhotoUrls)
+                            {
+                                <img src="@url" alt="صورة"
+                                     style="width:100%;height:90px;object-fit:cover;
+                                border:1px solid var(--border);cursor:pointer;
+                                transition:all 0.2s"
+                                     onmouseover="this.style.borderColor='var(--gold)'"
+                                     onmouseout="this.style.borderColor='var(--border)'"
+                                     onclick="document.querySelector('.main-photo').src=this.src" />
+                            }
+                        </div>
                     }
                 </div>
-                <div class="details-image-overlay">
-                    <span class="badge badge-gold">@Model.Category</span>
-                    <span class="badge @(Model.Status == "Available" ? "badge-green" : "badge-muted")">
-                        @(Model.Status == "Available" ? "✅ متاح الآن" : "⏳ مؤجر حالياً")
-                    </span>
+            }
+            else
+            {
+                <div class="details-image-section">
+                    <div class="details-image">
+                        @switch (Model.Category)
+                        {
+                            case "Crane":
+                                <text>🏗</text>
+                                break;
+                            case "Excavator":
+                                <text>🚜</text>
+                                break;
+                            case "Generator":
+                                <text>⚡</text>
+                                break;
+                            case "Bulldozer":
+                                <text>🚧</text>
+                                break;
+                            default:
+                                <text>🔧</text>
+                                break;
+                        }
+                    </div>
+                    <div class="details-image-overlay">
+                        <span class="badge badge-gold">@Model.Category</span>
+                        <span class="badge @(Model.Status == "Available" ? "badge-green" : "badge-muted")">
+                            @(Model.Status == "Available" ? "✅ متاح الآن" : "⏳ مؤجر حالياً")
+                        </span>
+                    </div>
                 </div>
-            </div>
+            }
 
             <!-- Info Card -->
             <div class="details-info-card">

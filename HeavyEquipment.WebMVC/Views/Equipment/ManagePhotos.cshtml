@@ -1,0 +1,134 @@
+﻿@model HeavyEquipment.Application.Features.Equipments.Dto.EquipmentDto
+@{
+    ViewData["Title"] = "إدارة صور المعدة";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "equipment";
+}
+
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">MANAGE PHOTOS</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">صور المعدة</h1>
+            <p class="page-header-desc">@Model.Name — يمكنك إضافة حتى 5 صور</p>
+        </div>
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn-outline btn-sm">
+            ← رجوع للمعدة
+        </a>
+    </div>
+
+    <div style="padding:2rem 4rem">
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">✅ @TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-error">❌ @TempData["Error"]</div>
+        }
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
+
+            <!-- Current Photos -->
+            <div>
+                <div style="font-weight:700;font-size:1rem;margin-bottom:1rem;color:var(--gold)">
+                    📸 الصور الحالية (@Model.PhotoUrls.Count / 5)
+                </div>
+
+                @if (!Model.PhotoUrls.Any())
+                {
+                    <div class="empty-state" style="padding:3rem 1rem;border:1px solid var(--border)">
+                        <div class="empty-icon">📷</div>
+                        <div class="empty-title">لا توجد صور</div>
+                        <div class="empty-desc">أضف صور لمعدتك لجذب المستأجرين</div>
+                    </div>
+                }
+                else
+                {
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                        @foreach (var url in Model.PhotoUrls)
+                        {
+                            <div style="position:relative;border:1px solid var(--border);overflow:hidden">
+                                <img src="@url" alt="صورة المعدة"
+                                     style="width:100%;height:160px;object-fit:cover;display:block" />
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Upload Form -->
+            @if (Model.PhotoUrls.Count < 5)
+            {
+                <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem">
+                    <div style="font-weight:700;font-size:1rem;margin-bottom:1.2rem">
+                        ➕ رفع صورة جديدة
+                    </div>
+
+                    <form asp-action="AddPhoto" asp-controller="Equipment"
+                          method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="equipmentId" value="@Model.Id" />
+
+                        <div class="form-group">
+                            <label class="form-label">اختر صورة *</label>
+                            <input type="file" name="photos" class="form-control"
+                                   accept=".jpg,.jpeg,.png,.webp"
+                                   multiple
+                                   onchange="previewImages(this)" />
+                            <small style="color:var(--muted);font-size:0.78rem;margin-top:0.3rem;display:block">
+                                يمكنك اختيار حتى @(5 - Model.PhotoUrls.Count) صور دفعة واحدة
+                            </small>
+                        </div>
+
+                        <!-- Preview -->
+                        <div id="preview" style="display:none;margin-bottom:1rem">
+                            <img id="previewImg" src="" alt="معاينة"
+                                 style="width:100%;height:180px;object-fit:cover;border:1px solid var(--border)" />
+                        </div>
+
+                        <button type="submit" class="btn-primary btn-full">
+                            📤 رفع الصورة
+                        </button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <div style="background:rgba(212,168,67,0.05);border:1px solid rgba(212,168,67,0.2);padding:1.5rem;text-align:center">
+                    <div style="font-size:2rem;margin-bottom:0.5rem">📸</div>
+                    <div style="color:var(--gold);font-weight:700">وصلت للحد الأقصى</div>
+                    <div style="color:var(--muted);font-size:0.85rem;margin-top:0.3rem">
+                        تم إضافة 5 صور — الحد الأقصى المسموح به
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function previewImages(input) {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+            if (input.files && input.files.length > 0) {
+                preview.style.display = 'grid';
+                preview.style.gridTemplateColumns = 'repeat(3,1fr)';
+                preview.style.gap = '0.5rem';
+                Array.from(input.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style = 'width:100%;height:100px;object-fit:cover;border:1px solid var(--border)';
+                        preview.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+    </script>
+}

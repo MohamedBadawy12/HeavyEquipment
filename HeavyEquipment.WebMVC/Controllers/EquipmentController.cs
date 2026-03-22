@@ -1,4 +1,5 @@
-﻿using HeavyEquipment.Application.Features.Equipments.Commands.Create;
+﻿using HeavyEquipment.Application.Features.Equipments.Commands;
+using HeavyEquipment.Application.Features.Equipments.Commands.Create;
 using HeavyEquipment.Application.Features.Equipments.Commands.Queries;
 using HeavyEquipment.Application.Features.Equipments.Commands.Update;
 using HeavyEquipment.Domain.Enums;
@@ -104,6 +105,32 @@ namespace HeavyEquipment.WebMVC.Controllers
                 result.IsSuccess ? "تم تحديث حالة المعدة" : result.Error;
 
             return RedirectToAction(nameof(MyEquipments));
+        }
+
+        [Authorize(Roles = "Owner")]
+        public async Task<IActionResult> ManagePhotos(Guid id)
+        {
+            var result = await _mediator.Send(new GetEquipmentByIdQuery(id));
+            if (!result.IsSuccess) return RedirectToAction(nameof(MyEquipments));
+            if (result.Value!.OwnerId != CurrentUserId)
+                return Forbid();
+            return View(result.Value);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Owner")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddPhoto(Guid equipmentId, List<IFormFile> photos)
+        {
+            var result = await _mediator.Send(
+                new AddEquipmentPhotoCommand(equipmentId, CurrentUserId, photos));
+
+            TempData[result.IsSuccess ? "Success" : "Error"] =
+                result.IsSuccess
+                    ? $"تم رفع {result.Value!.Count} صورة بنجاح ✅"
+                    : result.Error;
+
+            return RedirectToAction(nameof(ManagePhotos), new { id = equipmentId });
         }
     }
 }

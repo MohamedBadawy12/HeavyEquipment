@@ -143,6 +143,14 @@
                                        asp-route-id="@item.Id"
                                        class="action-btn action-view" title="عرض">👁</a>
 
+                                    <a asp-controller="Equipment"
+                                       asp-action="ManagePhotos"
+                                       asp-route-id="@item.Id"
+                                       class="action-btn" title="إدارة الصور"
+                                       style="background:rgba(212,168,67,0.1);color:var(--gold);border:1px solid rgba(212,168,67,0.3)">
+                                        📸
+                                    </a>
+
                                     <!-- Update Status Dropdown -->
                                     <div class="status-dropdown-wrapper">
                                         <button class="action-btn action-edit"
