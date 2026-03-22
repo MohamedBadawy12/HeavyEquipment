@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HeavyEquipment.Domain\HeavyEquipment.Domain.csproj" />
+	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
 </Project>

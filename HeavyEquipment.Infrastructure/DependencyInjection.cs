@@ -23,6 +23,7 @@ namespace HeavyEquipment.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IEmailService, SendGridEmailService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IImageService, LocalImageService>();
 
             return services;
         }
