@@ -84,6 +84,14 @@ namespace HeavyEquipment.WebMVC.Controllers
 
             if (result.Succeeded)
             {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user is not null && user.IsBlocked)
+                {
+                    await _signInManager.SignOutAsync();
+                    ModelState.AddModelError("", "تم حظر حسابك. تواصل مع الإدارة للمزيد من المعلومات.");
+                    return View(model);
+                }
+
                 TempData["Success"] = "تم تسجيل الدخول بنجاح!";
                 return LocalRedirect(returnUrl ?? "/");
             }
