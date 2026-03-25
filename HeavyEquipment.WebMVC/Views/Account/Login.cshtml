@@ -76,7 +76,7 @@
                 <div class="form-group">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
                         <label class="form-label">كلمة المرور</label>
-                        <a href="#" class="auth-forgot">نسيت كلمة المرور؟</a>
+                        <a asp-controller="Account" asp-action="ForgotPassword" class="auth-forgot">نسيت كلمة المرور؟</a>
                     </div>
                     <div class="input-password-wrapper">
                         <input asp-for="Password"

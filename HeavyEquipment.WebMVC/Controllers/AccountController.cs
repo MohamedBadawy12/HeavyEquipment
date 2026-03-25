@@ -1,8 +1,10 @@
-﻿using HeavyEquipment.Domain.Entities;
+﻿using HeavyEquipment.Application.Features.Users.Commands;
+using HeavyEquipment.Domain.Entities;
 using HeavyEquipment.Domain.Enums;
 using HeavyEquipment.Domain.Exceptions;
 using HeavyEquipment.Domain.Interfaces;
 using HeavyEquipment.WebMVC.ViewModels.Account;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +15,15 @@ namespace HeavyEquipment.WebMVC.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IMediator _mediator;
 
         public AccountController(
             UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager, IUnitOfWork unitOfWork) : base(unitOfWork)
+            SignInManager<AppUser> signInManager, IMediator mediator, IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _mediator = mediator;
         }
 
         public IActionResult Register(string? role)
@@ -142,6 +146,68 @@ namespace HeavyEquipment.WebMVC.Controllers
             }
 
             return RedirectToAction(nameof(Profile));
+        }
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string phoneNumber)
+        {
+            var result = await _mediator.Send(new ForgotPasswordCommand(phoneNumber));
+
+            if (result.IsSuccess)
+            {
+                TempData["PhoneNumber"] = phoneNumber;
+                return RedirectToAction("ResetPassword");
+            }
+
+            ModelState.AddModelError("", result.Error);
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword()
+        {
+            var phoneNumber = TempData["PhoneNumber"] as string;
+
+            if (string.IsNullOrEmpty(phoneNumber))
+            {
+                return RedirectToAction(nameof(ForgotPassword));
+            }
+
+            TempData.Keep("PhoneNumber");
+
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordCommand command)
+        {
+            if (string.IsNullOrEmpty(command.PhoneNumber))
+            {
+                var phone = TempData["PhoneNumber"] as string;
+                if (string.IsNullOrEmpty(phone))
+                {
+                    return RedirectToAction(nameof(ForgotPassword));
+                }
+
+                command = command with { PhoneNumber = phone };
+            }
+            var result = await _mediator.Send(command);
+
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "تم تغيير كلمة المرور بنجاح، يمكنك تسجيل الدخول الآن.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            ModelState.AddModelError("", result.Error ?? "حدث خطأ أثناء إعادة تعيين كلمة المرور");
+
+            TempData["PhoneNumber"] = command.PhoneNumber;
+
+            return View(command);
         }
     }
 }

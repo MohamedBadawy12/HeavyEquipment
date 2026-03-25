@@ -24,6 +24,7 @@ namespace HeavyEquipment.Infrastructure
             services.AddScoped<IEmailService, SendGridEmailService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IImageService, LocalImageService>();
+            services.AddTransient<ISmsService, TwilioSmsService>();
 
             return services;
         }

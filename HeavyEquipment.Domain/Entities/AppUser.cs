@@ -15,6 +15,8 @@ namespace HeavyEquipment.Domain.Entities
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; private set; }
         public bool IsDeleted { get; private set; } = false;
+        public string? VerificationCode { get; private set; }
+        public DateTime? CodeExpiry { get; private set; }
 
         private readonly List<Equipment> _ownedEquipments = new();
         public virtual IReadOnlyCollection<Equipment> OwnedEquipments => _ownedEquipments.AsReadOnly();
@@ -88,5 +90,20 @@ namespace HeavyEquipment.Domain.Entities
 
         public void AddNotification(Notification notification)
             => _notifications.Add(notification);
+
+        public void SetVerificationCode(string code, int expiryMinutes = 3)
+        {
+            if (string.IsNullOrWhiteSpace(code)) throw new DomainException("الكود مطلوب");
+
+            VerificationCode = code;
+            CodeExpiry = DateTime.UtcNow.AddMinutes(expiryMinutes);
+            UpdatedAt = DateTime.UtcNow;
+        }
+        public void ClearVerificationCode()
+        {
+            VerificationCode = null;
+            CodeExpiry = null;
+            UpdatedAt = DateTime.UtcNow;
+        }
     }
 }
