@@ -88,6 +88,30 @@ namespace HeavyEquipment.Application.Features.Users.Commands.Queries
                     .ToList()
             };
 
+            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-5);
+            var growthData = users
+                .Where(u => u.CreatedAt >= sixMonthsAgo)
+                .GroupBy(u => new { u.CreatedAt.Year, u.CreatedAt.Month })
+                .Select(g => new
+                {
+                    Label = $"{g.Key.Month}/{g.Key.Year}",
+                    Count = g.Count(),
+                    Sort = g.Key.Year * 12 + g.Key.Month
+                })
+                .OrderBy(x => x.Sort)
+                .ToList();
+
+            vm.UserGrowthLabels = growthData.Select(x => x.Label).ToList();
+            vm.UserGrowthValues = growthData.Select(x => x.Count).ToList();
+
+            vm.UserRoleDistribution = new List<int> { vm.TotalOwners, vm.TotalCustomers };
+
+            vm.EquipmentStatusStats = new List<int> {
+                vm.AvailableEquipments,
+                vm.RentedEquipments,
+                equipments.Count(e => e.Status == "UnderMaintenance")
+            };
+
             return Result<AdminDashboardDto>.Success(vm);
         }
     }

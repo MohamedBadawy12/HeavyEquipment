@@ -29,5 +29,14 @@ namespace HeavyEquipment.Application.Features.Users.Dtos
         // Recent
         public List<AdminUserRow> RecentUsers { get; set; } = new();
         public List<RentalOrderSummaryDto> RecentOrders { get; set; } = new();
+
+        // نمو المستخدمين آخر 6 شهور
+        public List<string> UserGrowthLabels { get; set; } = new();
+        public List<int> UserGrowthValues { get; set; } = new();
+
+        // توزيع المستخدمين (Owner vs Customer)
+        public List<int> UserRoleDistribution { get; set; } = new();
+        // حالات المعدات الكلية في السيستم
+        public List<int> EquipmentStatusStats { get; set; } = new();
     }
 }

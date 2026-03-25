@@ -179,5 +179,75 @@
                 </div>
             </div>
         </div>
+        <div class="dashboard-grid mb-4">
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <div class="dashboard-card-title">👥 نمو المنصة (مستخدمين جدد)</div>
+                </div>
+                <div style="padding:1.5rem">
+                    <canvas id="userGrowthChart" style="max-height: 280px;"></canvas>
+                </div>
+            </div>
+
+            <div class="dashboard-card">
+                <div class="dashboard-card-header">
+                    <div class="dashboard-card-title">📊 توزيع الحسابات والمعدات</div>
+                </div>
+                <div style="padding:1.5rem; display: flex; gap: 10px;">
+                    <div style="flex:1"><canvas id="rolesChart"></canvas></div>
+                    <div style="flex:1"><canvas id="adminEquipChart"></canvas></div>
+                </div>
+            </div>
+        </div>
     </div>
+    
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartOptions = {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#888', font: { family: 'Cairo' } } } }
+        };
+
+        new Chart(document.getElementById('userGrowthChart'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(Model.UserGrowthLabels)),
+                datasets: [{
+                    label: 'مستخدم جديد',
+                    data: @Html.Raw(Json.Serialize(Model.UserGrowthValues)),
+                    backgroundColor: 'rgba(212, 168, 67, 0.6)',
+                    borderColor: '#D4A843',
+                    borderWidth: 1
+                }]
+            },
+            options: chartOptions
+        });
+
+        new Chart(document.getElementById('rolesChart'), {
+            type: 'pie',
+            data: {
+                labels: ['أصحاب معدات', 'مستأجرين'],
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.UserRoleDistribution)),
+                    backgroundColor: ['#D4A843', '#3498db']
+                }]
+            },
+            options: { ...chartOptions, plugins: { title: { display: true, text: 'المستخدمين', color: '#fff' } } }
+        });
+
+        new Chart(document.getElementById('adminEquipChart'), {
+            type: 'pie',
+            data: {
+                labels: ['متاح', 'مؤجر', 'صيانة'],
+                datasets: [{
+                    data: @Html.Raw(Json.Serialize(Model.EquipmentStatusStats)),
+                    backgroundColor: ['#2ecc71', '#f1c40f', '#e74c3c']
+                }]
+            },
+            options: { ...chartOptions, plugins: { title: { display: true, text: 'المعدات', color: '#fff' } } }
+        });
+    </script>
+}
