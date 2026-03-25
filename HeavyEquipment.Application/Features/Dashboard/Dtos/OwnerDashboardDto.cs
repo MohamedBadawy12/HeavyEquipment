@@ -20,5 +20,9 @@ namespace HeavyEquipment.Application.Features.Dashboard.Dtos
         public List<EquipmentSummaryDto> Equipments { get; set; } = new();
         public List<RentalOrderSummaryDto> RecentOrders { get; set; } = new();
         public List<RentalOrderSummaryDto> PendingOrders { get; set; } = new();
+
+        public List<string> RevenueLabels { get; set; } = new();
+        public List<decimal> RevenueValues { get; set; } = new();
+        public List<int> EquipmentStatusValues { get; set; } = new();
     }
 }

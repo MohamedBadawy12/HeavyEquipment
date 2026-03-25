@@ -77,6 +77,28 @@ namespace HeavyEquipment.Application.Features.Dashboard.Commands
                     .ToList()
             };
 
+            var sixMonthsAgo = DateTime.UtcNow.AddMonths(-5);
+            var revenueData = allOrders
+                .Where(o => o.Status == OrderStatus.Completed.ToString() && o.RentalEnd >= sixMonthsAgo)
+                .GroupBy(o => new { o.RentalEnd.Year, o.RentalEnd.Month })
+                .Select(g => new
+                {
+                    Label = $"{g.Key.Month}/{g.Key.Year}",
+                    Value = g.Sum(o => o.TotalPrice),
+                    Sort = g.Key.Year * 12 + g.Key.Month
+                })
+                .OrderBy(x => x.Sort)
+                .ToList();
+
+            dto.RevenueLabels = revenueData.Select(x => x.Label).ToList();
+            dto.RevenueValues = revenueData.Select(x => x.Value).ToList();
+
+            dto.EquipmentStatusValues = new List<int> {
+                dto.AvailableEquipments,
+                dto.RentedEquipments,
+                dto.UnderMaintenance
+            };
+
             return Result<OwnerDashboardDto>.Success(dto);
         }
     }
