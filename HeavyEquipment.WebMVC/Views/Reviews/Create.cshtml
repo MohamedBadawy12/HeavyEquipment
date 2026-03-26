@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "إضافة تقييم";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "rental";
+}
+<style>
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        gap: 0.3rem;
+        margin-top: 0.5rem;
+    }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 2.5rem;
+            color: var(--border);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+            .star-rating input:checked ~ label,
+            .star-rating label:hover,
+            .star-rating label:hover ~ label {
+                color: var(--gold);
+            }
+</style>
+<div class="inner-page">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div class="section-label">REVIEW</div>
+            <div class="gold-divider"></div>
+            <h1 class="section-title">تقييم تجربتك</h1>
+            <p class="page-header-desc">شاركنا رأيك لمساعدة المستخدمين الآخرين</p>
+        </div>
+        <a asp-controller="RentalOrder" asp-action="Details"
+           asp-route-id="@ViewBag.OrderId" class="btn-outline btn-sm">
+            ← رجوع
+        </a>
+    </div>
+
+    <div style="padding:2rem 4rem;max-width:600px">
+        <form asp-action="Create" asp-controller="Reviews" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+
+            <div style="background:var(--card);border:1px solid var(--border);padding:2rem">
+
+                <!-- Star Rating -->
+                <div class="form-group">
+                    <label class="form-label">التقييم *</label>
+                    <div class="star-rating" dir="ltr">
+                        @for (int i = 5; i >= 1; i--)
+                        {
+                            <input type="radio" name="rating" id="star@i" value="@i" required />
+                            <label for="star@i" title="@i نجوم">★</label>
+                        }
+                    </div>
+                    <small style="color:var(--muted);font-size:0.78rem;margin-top:0.5rem;display:block">
+                        اختر من 1 إلى 5 نجوم
+                    </small>
+                </div>
+
+                <!-- Comment -->
+                <div class="form-group">
+                    <label class="form-label">تعليقك *</label>
+                    <textarea name="comment" class="form-control" rows="5"
+                              placeholder="شاركنا تجربتك مع هذه المعدة..."
+                              required minlength="10"></textarea>
+                </div>
+
+                <div style="display:flex;gap:1rem;justify-content:flex-end">
+                    <a asp-controller="RentalOrder" asp-action="Details"
+                       asp-route-id="@ViewBag.OrderId" class="btn-outline">
+                        إلغاء
+                    </a>
+                    <button type="submit" class="btn-primary">⭐ إرسال التقييم</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+

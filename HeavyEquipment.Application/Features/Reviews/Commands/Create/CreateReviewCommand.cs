@@ -8,9 +8,9 @@ namespace HeavyEquipment.Application.Features.Reviews.Commands.Create
 {
     public record CreateReviewCommand(
          Guid RentalOrderId,
-         Guid ReviewerId,
-         int Rating,
-         string Comment,
+        Guid ReviewerId,
+        int Rating,
+        string Comment,
          ReviewType Type) : IRequest<Result<Guid>>;
 
     public class CreateReviewHandler : IRequestHandler<CreateReviewCommand, Result<Guid>>
@@ -20,30 +20,25 @@ namespace HeavyEquipment.Application.Features.Reviews.Commands.Create
 
         public async Task<Result<Guid>> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
         {
-            var exists = await _unitOfWork.Reviews.ExistsAsync(r =>
-                r.RentalOrderId == request.RentalOrderId &&
-                r.ReviewerId == request.ReviewerId &&
-                r.Type == request.Type, cancellationToken);
+            var order = await _unitOfWork.RentalOrders.GetByIdAsync(request.RentalOrderId, cancellationToken);
+            if (order is null)
+                return Result<Guid>.Failure("الطلب غير موجود");
 
-            if (exists)
-                return Result<Guid>.Failure("لقد قمت بإضافة تقييم لهذا الطلب مسبقاً.");
+            if (order.Status != HeavyEquipment.Domain.Enums.OrderStatus.Completed)
+                return Result<Guid>.Failure("يمكن التقييم فقط بعد اكتمال الطلب");
 
             var review = new Review(
                 request.RentalOrderId,
                 request.ReviewerId,
                 request.Rating,
                 request.Comment,
-                request.Type
-            );
+                request.Type);
 
+            order.AddReview(review);
             await _unitOfWork.Reviews.AddAsync(review, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var result = await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            if (result > 0)
-                return Result<Guid>.Success(review.Id);
-
-            return Result<Guid>.Failure("حدث خطأ أثناء حفظ التقييم.");
+            return Result<Guid>.Success(review.Id);
         }
     }
 }

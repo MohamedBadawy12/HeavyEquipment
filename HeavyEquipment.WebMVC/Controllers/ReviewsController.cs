@@ -1,32 +1,44 @@
 ﻿using HeavyEquipment.Application.Features.Reviews.Commands.Create;
 using HeavyEquipment.Application.Features.Reviews.Commands.Queries;
 using HeavyEquipment.Application.Features.Reviews.Commands.Update;
+using HeavyEquipment.Domain.Enums;
 using HeavyEquipment.Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HeavyEquipment.WebMVC.Controllers
 {
     public class ReviewsController : BaseController
     {
         private readonly IMediator _mediator;
+        public ReviewsController(IMediator mediator, IUnitOfWork unitOfWork) : base(unitOfWork) => _mediator = mediator;
 
-        public ReviewsController(IMediator mediator, IUnitOfWork unitOfWork) : base(unitOfWork)
+        private Guid CurrentUserId =>
+           Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+
+        [Authorize(Roles = "Customer")]
+        public IActionResult Create(Guid orderId)
         {
-            _mediator = mediator;
+            ViewBag.OrderId = orderId;
+            return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Customer")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateReviewCommand command)
+        public async Task<IActionResult> Create(
+            Guid orderId, int rating, string comment)
         {
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(new CreateReviewCommand(
+                orderId, CurrentUserId, rating, comment, ReviewType.RenterReview));
 
-            if (result.IsSuccess)
-                return RedirectToAction("Details", "RentalOrder", new { id = command.RentalOrderId });
+            TempData[result.IsSuccess ? "Success" : "Error"] =
+                result.IsSuccess ? "تم إضافة تقييمك بنجاح ✅" : result.Error;
 
-            TempData["Error"] = result.Error;
-            return RedirectToAction("Details", "RentalOrder", new { id = command.RentalOrderId });
+            return RedirectToAction("Details", "RentalOrder", new { id = orderId });
         }
 
         [HttpGet]
