@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "التحقق من الكود";
+    Layout = "_NewLayout";
+    ViewData["PageCss"] = "auth";
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">📱</div>
+            <h1 class="auth-title">أدخل كود التحقق</h1>
+            <p class="auth-subtitle">
+                تم إرسال كود مكون من 6 أرقام إلى رقم هاتفك
+            </p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-error">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>❌ @error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form asp-action="VerifyResetCode" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="phoneNumber" value="@ViewBag.Phone" />
+
+            <div class="form-group">
+                <label class="form-label">كود التحقق *</label>
+                <input type="text" name="code" class="form-control"
+                       placeholder="أدخل الكود المكون من 6 أرقام"
+                       maxlength="6" style="letter-spacing:0.5rem;font-size:1.2rem;text-align:center"
+                       required autofocus />
+            </div>
+
+            <button type="submit" class="btn-primary btn-full" style="margin-top:0.5rem">
+                ✅ التحقق من الكود
+            </button>
+        </form>
+
+        <div style="text-align:center;margin-top:1.5rem;font-size:0.875rem;color:var(--muted)">
+            لم يصلك الكود؟
+            <a asp-action="ForgotPassword" style="color:var(--gold);text-decoration:none;font-weight:700">
+                إعادة الإرسال
+            </a>
+        </div>
+    </div>
+</div>

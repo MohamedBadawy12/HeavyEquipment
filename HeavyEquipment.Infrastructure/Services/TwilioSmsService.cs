@@ -1,37 +1,43 @@
 ﻿using HeavyEquipment.Domain.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace HeavyEquipment.Infrastructure.Services
 {
     public class TwilioSmsService : ISmsService
     {
         private readonly IConfiguration _config;
+        private readonly ILogger<TwilioSmsService> _logger;
 
-        public TwilioSmsService(IConfiguration config) => _config = config;
-
-        public async Task<bool> SendSmsAsync(string phoneNumber, string message, CancellationToken ct = default)
+        public TwilioSmsService(IConfiguration config, ILogger<TwilioSmsService> logger)
         {
-            var sid = _config["Twilio:AccountSid"];
-            var token = _config["Twilio:AuthToken"];
-            var from = _config["Twilio:FromNumber"];
+            _config = config;
+            _logger = logger;
+        }
 
-            try
-            {
-                TwilioClient.Init(sid, token);
-                var response = await MessageResource.CreateAsync(
-                    body: message,
-                    from: new Twilio.Types.PhoneNumber(from),
-                    to: new Twilio.Types.PhoneNumber(phoneNumber)
-                );
+        public async Task SendAsync(string toPhone, string message)
+        {
+            var accountSid = _config["Twilio:AccountSid"];
+            var authToken = _config["Twilio:AuthToken"];
+            var fromPhone = _config["Twilio:FromPhone"];
 
-                return response.Status != MessageResource.StatusEnum.Failed;
-            }
-            catch
+            if (string.IsNullOrEmpty(accountSid) || string.IsNullOrEmpty(authToken))
             {
-                return false;
+                _logger.LogWarning("Twilio credentials missing — skipping SMS to {Phone}", toPhone);
+                return;
             }
+
+            TwilioClient.Init(accountSid, authToken);
+
+            var msg = await MessageResource.CreateAsync(
+                to: new PhoneNumber(toPhone),
+                from: new PhoneNumber(fromPhone),
+                body: message);
+
+            _logger.LogInformation("SMS sent to {Phone} — SID: {Sid}", toPhone, msg.Sid);
         }
     }
 }

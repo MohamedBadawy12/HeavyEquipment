@@ -1,5 +1,4 @@
-﻿using HeavyEquipment.Application.Features.Users.Commands;
-using HeavyEquipment.Domain.Entities;
+﻿using HeavyEquipment.Domain.Entities;
 using HeavyEquipment.Domain.Enums;
 using HeavyEquipment.Domain.Exceptions;
 using HeavyEquipment.Domain.Interfaces;
@@ -16,14 +15,17 @@ namespace HeavyEquipment.WebMVC.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IMediator _mediator;
+        private readonly ISmsService _smsService;
 
         public AccountController(
             UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager, IMediator mediator, IUnitOfWork unitOfWork) : base(unitOfWork)
+            SignInManager<AppUser> signInManager, IMediator mediator,
+            IUnitOfWork unitOfWork, ISmsService smsService) : base(unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mediator = mediator;
+            _smsService = smsService;
         }
 
         public IActionResult Register(string? role)
@@ -147,67 +149,117 @@ namespace HeavyEquipment.WebMVC.Controllers
 
             return RedirectToAction(nameof(Profile));
         }
-        [HttpGet]
-        public IActionResult ForgotPassword()
-        {
-            return View();
-        }
+
+        public IActionResult ForgotPassword() => View();
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(string phoneNumber)
         {
-            var result = await _mediator.Send(new ForgotPasswordCommand(phoneNumber));
+            var user = _userManager.Users
+                .FirstOrDefault(u => u.PhoneNumber == phoneNumber && !u.IsDeleted);
 
-            if (result.IsSuccess)
+            if (user is null)
             {
-                TempData["PhoneNumber"] = phoneNumber;
-                return RedirectToAction("ResetPassword");
+                TempData["Info"] = "لو الرقم مسجل، هيوصلك كود خلال ثوان";
+                return RedirectToAction(nameof(VerifyResetCode));
             }
 
-            ModelState.AddModelError("", result.Error);
+            var code = new Random().Next(100000, 999999).ToString();
+            var purpose = "ResetPassword";
+
+            await _userManager.RemoveAuthenticationTokenAsync(user, "Phone", purpose);
+            await _userManager.SetAuthenticationTokenAsync(user, "Phone", purpose, code);
+
+            var message = $"كود إعادة تعيين كلمة مرور HeavyHub: {code} — صالح لمدة 10 دقائق";
+            await _smsService.SendAsync(user.PhoneNumber!, message);
+
+            TempData["ResetPhone"] = phoneNumber;
+            TempData["Info"] = "تم إرسال كود التحقق على رقمك";
+            return RedirectToAction(nameof(VerifyResetCode));
+        }
+
+        public IActionResult VerifyResetCode()
+        {
+            ViewBag.Phone = TempData["ResetPhone"];
             return View();
         }
 
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyResetCode(string phoneNumber, string code)
+        {
+            var user = _userManager.Users
+                .FirstOrDefault(u => u.PhoneNumber == phoneNumber && !u.IsDeleted);
+
+            if (user is null)
+            {
+                ModelState.AddModelError("", "رقم الهاتف غير صحيح");
+                return View();
+            }
+
+            var savedCode = await _userManager.GetAuthenticationTokenAsync(user, "Phone", "ResetPassword");
+
+            if (savedCode != code)
+            {
+                ModelState.AddModelError("", "الكود غير صحيح أو منتهي الصلاحية");
+                return View();
+            }
+
+            TempData["ResetPhone"] = phoneNumber;
+            TempData["ResetCode"] = code;
+            return RedirectToAction(nameof(ResetPassword));
+        }
+
         public IActionResult ResetPassword()
         {
-            var phoneNumber = TempData["PhoneNumber"] as string;
+            ViewBag.Phone = TempData.Peek("ResetPhone");
+            ViewBag.Code = TempData.Peek("ResetCode");
+            return View();
+        }
 
-            if (string.IsNullOrEmpty(phoneNumber))
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(
+            string phoneNumber, string code,
+            string newPassword, string confirmPassword)
+        {
+            if (newPassword != confirmPassword)
             {
+                ModelState.AddModelError("", "كلمتا المرور غير متطابقتين");
+                return View();
+            }
+
+            var user = _userManager.Users
+                .FirstOrDefault(u => u.PhoneNumber == phoneNumber && !u.IsDeleted);
+
+            if (user is null)
+            {
+                ModelState.AddModelError("", "حدث خطأ. حاول مرة أخرى");
+                return View();
+            }
+
+            var savedCode = await _userManager.GetAuthenticationTokenAsync(user, "Phone", "ResetPassword");
+            if (savedCode != code)
+            {
+                ModelState.AddModelError("", "انتهت صلاحية الكود. حاول مرة أخرى");
                 return RedirectToAction(nameof(ForgotPassword));
             }
 
-            TempData.Keep("PhoneNumber");
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
 
-            return View();
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordCommand command)
-        {
-            if (string.IsNullOrEmpty(command.PhoneNumber))
+            if (!result.Succeeded)
             {
-                var phone = TempData["PhoneNumber"] as string;
-                if (string.IsNullOrEmpty(phone))
-                {
-                    return RedirectToAction(nameof(ForgotPassword));
-                }
-
-                command = command with { PhoneNumber = phone };
-            }
-            var result = await _mediator.Send(command);
-
-            if (result.IsSuccess)
-            {
-                TempData["SuccessMessage"] = "تم تغيير كلمة المرور بنجاح، يمكنك تسجيل الدخول الآن.";
-                return RedirectToAction(nameof(Login));
+                foreach (var e in result.Errors)
+                    ModelState.AddModelError("", e.Description);
+                return View();
             }
 
-            ModelState.AddModelError("", result.Error ?? "حدث خطأ أثناء إعادة تعيين كلمة المرور");
+            await _userManager.RemoveAuthenticationTokenAsync(user, "Phone", "ResetPassword");
 
-            TempData["PhoneNumber"] = command.PhoneNumber;
-
-            return View(command);
+            TempData["Success"] = "تم تغيير كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.";
+            return RedirectToAction(nameof(Login));
         }
     }
 }

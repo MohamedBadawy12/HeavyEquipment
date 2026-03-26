@@ -91,7 +91,7 @@ namespace HeavyEquipment.Domain.Entities
         public void AddNotification(Notification notification)
             => _notifications.Add(notification);
 
-        public void SetVerificationCode(string code, int expiryMinutes = 3)
+        public void SetVerificationCode(string code, int expiryMinutes = 10)
         {
             if (string.IsNullOrWhiteSpace(code)) throw new DomainException("الكود مطلوب");
 

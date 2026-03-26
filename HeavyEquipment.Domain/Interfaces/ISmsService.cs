@@ -2,6 +2,6 @@
 {
     public interface ISmsService
     {
-        Task<bool> SendSmsAsync(string phoneNumber, string message, CancellationToken ct = default);
+        Task SendAsync(string toPhone, string message);
     }
 }
