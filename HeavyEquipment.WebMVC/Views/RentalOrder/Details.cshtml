@@ -40,11 +40,23 @@
                     <div>
                         <div class="order-ref">طلب رقم #@Model.Id.ToString()[..8].ToUpper()</div>
                         <div class="order-equip-title">@Model.EquipmentName</div>
+
                     </div>
+                   
                     <span class="order-status @statusClass" style="font-size:1rem; padding:0.6rem 1.2rem">
                         @statusIcon @statusLabel
                     </span>
+                    <span  style="font-size:1rem; padding:0.6rem 1.2rem">
+                        @if (Model.Status == "Completed" && !User.IsInRole("Owner"))
+                        {
+                            <a asp-controller="Reviews" asp-action="Create"
+                               asp-route-orderId="@Model.Id" class="btn-outline btn-sm">
+                                ⭐ تقييم التجربة
+                            </a>
+                        }
+                    </span>
                 </div>
+                
 
                 <!-- Timeline -->
                 <div class="order-timeline">
@@ -199,6 +211,13 @@
                     </div>
                 }
             }
+            @* @if (Model.Status == "Completed" && !User.IsInRole("Owner"))
+            // {
+            //     <a asp-controller="Review" asp-action="Add"
+            //        asp-route-orderId="@Model.Id" class="btn-outline btn-sm">
+            //         ⭐ تقييم التجربة
+            //     </a>
+            // }*@
 
             <!-- ===== INSPECTIONS ===== -->
             @if (Model.InspectionsCount > 0)
@@ -282,6 +301,8 @@
                     @Model.EquipmentName ←
                 </a>
             </div>
+
+            
         </div>
     </div>
 </div>
